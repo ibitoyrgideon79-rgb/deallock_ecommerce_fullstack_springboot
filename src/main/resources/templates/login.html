@@ -26,12 +26,12 @@
 
       <ul class="nav-links" id="nav-links">
           <button class="nav-close" id="nav-close" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
-        <li><a href="#about">About Us</a></li>
-        <li><a href="#products">Items We Buy</a></li>
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="terms.html">Terms and Conditions</a></li>
-        <li><a href="#footer">Contact Us</a></li>
-        <li><a href="login.html">Sign In/Sign Up</a></li>
+        <li><a href="/#about">About Us</a></li>
+        <li><a href="/#products">Items We Buy</a></li>
+        <li><a href="/#how-it-works">How It Works</a></li>
+        <li><a href="/terms">Terms and Conditions</a></li>
+        <li><a href="/#footer">Contact Us</a></li>
+        <li><a href="/login">Sign In/Sign Up</a></li>
       </ul>
     </nav>
   </header>
@@ -39,6 +39,15 @@
   <div class="login-page">
     <div class="login-container">
         <h2 class="login-title">Login</h2>
+        <div class="login-error" th:if="${param.error}">
+            Invalid credentials or account not activated. Check your email for the activation link.
+        </div>
+        <div class="login-error" th:if="${param.activated}">
+            Account activated. You can now log in.
+        </div>
+        <div class="login-error" th:if="${param.reset}">
+            Password reset successful. You can now log in.
+        </div>
 
         <form class="login-form" id="loginForm" method="post" action="/login">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
@@ -58,7 +67,7 @@
 
             <div class="login-signup">
                 Don't have an account?
-                <a class="login-signup-link" href="register.html">Sign Up</a>
+                <a class="login-signup-link" href="/register">Sign Up</a>
             </div>
         </form>
     </div>
@@ -101,11 +110,11 @@
       <div class="footer-center">
         <h4>Quick Links</h4>
         <ul>
-          <li><a href="#about">About Us</a></li>
-          <li><a href="#products">Interested Products</a></li>
-          <li><a href="#how-it-works">How It Works</a></li>
-          <li><a href="terms.html">Terms and Conditions</a></li>
-          <li><a href="#footer">Contact Us</a></li>
+          <li><a href="/#about">About Us</a></li>
+          <li><a href="/#products">Interested Products</a></li>
+          <li><a href="/#how-it-works">How It Works</a></li>
+          <li><a href="/terms">Terms and Conditions</a></li>
+          <li><a href="/#footer">Contact Us</a></li>
         </ul>
       </div>
 

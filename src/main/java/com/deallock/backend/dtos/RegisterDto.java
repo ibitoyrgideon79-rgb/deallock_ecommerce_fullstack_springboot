@@ -1,22 +1,25 @@
 package com.deallock.backend.dtos;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import java.time.LocalDate;
 
 @Data
 public class RegisterDto {
 
-    @NotEmpty
+    @NotBlank
     private String fullName;
 
-    @NotEmpty
+    @NotBlank
     @Email
     private String email;
 
-    @Size(min = 6, message = "Password must be at least 6 characters long")
+    @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,}$",
+            message = "Password must be 8+ chars with upper, lower, number, special"
+    )
     private String password;
     private String confirmPassword;
     private String address;

@@ -15,6 +15,7 @@ const API_BASE = "/api";
         signupForm:   document.getElementById("signupForm"),
         successPopup: document.getElementById("successPopup"),
         countdown:    document.getElementById("countdown"),
+        status:       document.getElementById("statusMessage"),
     };
 
     const errors = {
@@ -40,6 +41,7 @@ const API_BASE = "/api";
             e.textContent = "";
         });
         document.querySelectorAll(".signup-input.error").forEach(i => i.classList.remove("error"));
+        if (els.status) els.status.textContent = "";
     }
 
     function updateGetCodeButton() {
@@ -84,8 +86,10 @@ const API_BASE = "/api";
             els.otpInput.value = "";
             els.verifyOtpBtn.disabled = false;
             els.getCodeBtn.textContent = "Resend Code";
+            if (els.status) els.status.textContent = data.message || "OTP sent. Check your email.";
         } catch (err) {
             showError(errors.email, err.message || "Could not send verification code");
+            if (els.status) els.status.textContent = err.message || "Could not send verification code";
         } finally {
             isSendingOtp = false;
             updateGetCodeButton();
@@ -124,10 +128,12 @@ const API_BASE = "/api";
             emailVerified = true;
             els.otpSection.style.display = "none";
             els.signupBtn.disabled = false;
+            if (els.status) els.status.textContent = data.message || "OTP verified.";
             
         } catch (err) {
             showError(errors.otp, err.message || "Verification failed");
             els.verifyOtpBtn.disabled = false;
+            if (els.status) els.status.textContent = err.message || "Verification failed";
         }
     });
 
@@ -137,6 +143,7 @@ const API_BASE = "/api";
 
         if (!emailVerified) {
             showError(errors.email, "Please verify your email first");
+            if (els.status) els.status.textContent = "Please verify your email first.";
             return;
         }
 
@@ -174,8 +181,9 @@ const API_BASE = "/api";
             showError(errors.username, "Username must be at least 9 characters");
             valid = false;
         }
-        if (values.password.length < 9) {
-            showError(errors.password, "Password must be at least 9 characters");
+        const strongPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!strongPwd.test(values.password)) {
+            showError(errors.password, "Password must be 8+ chars with upper, lower, number, special");
             valid = false;
         }
         if (values.confirmPassword !== values.password) {
@@ -183,7 +191,10 @@ const API_BASE = "/api";
             valid = false;
         }
 
-        if (!valid) return;
+        if (!valid) {
+            if (els.status) els.status.textContent = "Please fix the errors above.";
+            return;
+        }
 
         
         try {
@@ -197,6 +208,7 @@ const API_BASE = "/api";
                     username: values.username,
                     email:    values.email,
                     password: values.password,
+                    confirmPassword: values.confirmPassword,
                     
                 })
             });
@@ -217,11 +229,13 @@ const API_BASE = "/api";
                 els.countdown.textContent = sec;
                 if (sec <= 0) {
                     clearInterval(countdownTimer);
-                    window.location.href = "login.html";  
+                    window.location.href = "/login";  
                 }
             }, 1000);
 
         } catch (err) {
-            alert(err.message || "Something went wrong during registration");
+            if (els.status) {
+                els.status.textContent = err.message || "Something went wrong during registration";
+            }
         }
     });

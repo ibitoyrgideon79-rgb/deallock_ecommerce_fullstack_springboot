@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/frontend/style.css">
+  <link rel="stylesheet" href="/frontend/dashboard.css">
+  <link rel="icon" type="image/x-icon" href="/frontend/logo.jpeg">
+  <title>Deal Details - DealLock</title>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo-wrapper">
+        <a href="/" class="logo">
+          <img src="/frontend/logo.jpeg" alt="DealLock Logo">
+        </a>
+        <span class="slogan">Deal Details</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/dashboard">Back to Dashboard</a></li>
+        <li><a href="/logout">Log out</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="dashboard-container" style="padding: 24px;">
+    <section class="deal-card" style="width:100%; max-width:900px; margin:0 auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <h2 class="deal-title" th:text="${deal.title}">Deal Title</h2>
+        <span class="deal-status" th:text="${deal.status}">Approved</span>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
+      </div>
+
+      <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <strong>Client Name</strong>
+          <div th:text="${deal.clientName}">Client</div>
+        </div>
+        <div>
+          <strong>Deal Link</strong>
+          <div>
+            <a th:href="${deal.link}" th:text="${deal.link}" target="_blank" rel="noopener">Link</a>
+          </div>
+        </div>
+        <div>
+          <strong>Created At</strong>
+          <div th:text="${deal.createdAt}">Date</div>
+        </div>
+        <div>
+          <strong>Status</strong>
+          <div th:text="${deal.status}">Approved</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <strong>Description</strong>
+        <div th:text="${deal.description != null ? deal.description : 'No description provided.'}">
+          No description provided.
+        </div>
+      </div>
+
+      <div style="margin-top:16px;" th:if="${deal.itemPhoto != null}">
+        <strong>Item Photo</strong>
+        <div style="margin-top:8px;">
+          <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal item photo" style="max-width:100%; border-radius:12px;">
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

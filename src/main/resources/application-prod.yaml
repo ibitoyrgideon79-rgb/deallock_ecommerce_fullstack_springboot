@@ -1,0 +1,38 @@
+spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+  datasource:
+    url: jdbc:mysql://localhost:3306/deallock?createDatabaseIfNotExist=true
+    username: root
+    password: Profisic1.
+  jpa:
+    show-sql: false
+    hibernate: cd backend
+    ddl-auto: validate
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ibitoyrgideon79@gmail.com
+    password: twoeesweoqvsselm
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  base-url: http://localhost:8080
+
+
+server:
+  forward-headers-strategy: native
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: true
+        same-site: strict

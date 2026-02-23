@@ -44,7 +44,7 @@
             <input type ="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <div class="signup-form-group">
                 <label class="signup-label">Full Name</label>
-                <input th:object="${registerDto.fullName}" class="signup-input" type="text" id="fullName" required>
+                <input th:field="${registerDto.fullName}" class="signup-input" type="text" id="fullName" required>
                 <div class="signup-error" id="fullNameError"></div>
             </div>
 
@@ -184,7 +184,7 @@
     <button type="button" class="back-to-top" aria-label="Back to top"></button>
 
     <div class="footer-bottom">
-      Â© 2026 DealLock. All rights reserved.
+      © 2026 DealLock. All rights reserved.
     </div>
   </footer>
 

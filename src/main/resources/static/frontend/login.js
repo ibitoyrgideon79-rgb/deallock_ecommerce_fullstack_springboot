@@ -1,6 +1,5 @@
 
 document.getElementById("loginForm").addEventListener("submit", function(e) {
-    e.preventDefault();
 
     const username = document.getElementById("loginUsername");
     const password = document.getElementById("loginPassword");
@@ -37,9 +36,8 @@ document.getElementById("loginForm").addEventListener("submit", function(e) {
         isValid = false;
     }
 
-    if (isValid) {
-        alert("Login successful!");
-        
+    if (!isValid) {
+        e.preventDefault();
     }
 });
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,17 +35,21 @@
             <li class="user-menu-item">
               <button type="button" class="user-trigger" aria-label="User menu">
                 <img 
-                  src="/frontend/81218050339.jpg"
+                  th:src="${currentUser != null && currentUser.profileImage != null ? '/profile/image' : '/frontend/logo.jpeg'}"
+                  src="/frontend/logo.jpeg"
                   alt="User avatar" 
                   class="user-avatar"
                 >
-                <span class="username">Dahiru</span>
+                <span class="username" th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName : (currentUser != null ? currentUser.username : 'User')}">User</span>
                 <i class="fas fa-chevron-down chevron"></i>
               </button>
 
               <div class="user-dropdown-menu">
                 <a href="/profile" class="dropdown-link">
                   <i class="fas fa-user"></i> Profile
+                </a>
+                <a href="/admin" class="dropdown-link" th:if="${isAdmin}">
+                  <i class="fas fa-shield-alt"></i> Admin Console
                 </a>
                 <a href="/dashboard" class="dropdown-link">
                   <i class="fas fa-tachometer-alt"></i> Dashboard
@@ -69,14 +73,27 @@
     <div class="profile-section">
       <div class="profile-avatar-wrapper">
         <img 
-          src="/frontend/81218050339.jpg"
+          th:src="${currentUser != null && currentUser.profileImage != null ? '/profile/image' : '/frontend/logo.jpeg'}"
+          src="/frontend/logo.jpeg"
           alt="User avatar" 
           class="profile-avatar"
         >
       </div>
       <h2 class="greeting">
-        Hi, <span class="username">Dahiru</span>
+        Hi, <span class="username" th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName : (currentUser != null ? currentUser.username : 'User')}">User</span>
       </h2>
+    </div>
+
+    <div class="active-deals-section">
+      <div th:if="${param.upload}" class="signup-error" style="margin-bottom:8px;">
+        <span th:if="${param.upload[0] == 'success'}">Profile photo updated.</span>
+        <span th:if="${param.upload[0] == 'failed'}">Profile photo upload failed.</span>
+      </div>
+      <form action="/profile/upload" method="post" enctype="multipart/form-data" style="margin-bottom:12px;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="file" name="profileImage" accept="image/*" required>
+        <button type="submit" class="btn-submit" style="margin-top:8px;">Update Photo</button>
+      </form>
     </div>
 
    <div class="active-deals-section">
@@ -89,6 +106,7 @@
 
   
   <main class="main-content">
+    <div id="deal-status" class="signup-error" style="margin-bottom:10px;"></div>
     <button type="button" class="create-deal-card" id="open-create-modal">
       <div class="plus-icon">+</div>
       <div class="create-label">Create Deal</div>
@@ -110,27 +128,27 @@
 
       <div class="form-row">
         <label for="deal-title">Deal / Item Name</label>
-        <input type="text" id="deal-title" placeholder="e.g. iPhone 15 Pro Max 256GB" required>
+        <input type="text" id="deal-title" name="deal-title" placeholder="e.g. iPhone 15 Pro Max 256GB" required>
       </div>
 
        <div class="form-row">
-        <label for="deal-title">Deal / Item Link</label>
-        <input type="text" id="deal-title" placeholder="" required>
+        <label for="deal-link">Deal / Item Link</label>
+        <input type="text" id="deal-link" name="deal-link" placeholder="" required>
       </div>
 
       <div class="form-row">
         <label for="client-name">Client Name</label>
-        <input type="text" id="client-name" placeholder="Full name or Business name" required>
+        <input type="text" id="client-name" name="client-name" placeholder="Full name or Business name" required>
       </div>
 
       <div class="form-row">
-        <label for="deal-value">Expected Value (₦)</label>
-        <input type="number" id="deal-value" placeholder="e.g. 1250000" min="1000" required>
+        <label for="deal-value">Expected Value (NGN)</label>
+        <input type="number" id="deal-value" name="deal-value" placeholder="e.g. 1250000" min="1000" required>
       </div>
 
       <div class="form-row">
         <label for="description">Description / Details</label>
-        <textarea id="description" rows="5" placeholder="Item condition, location, delivery terms, payment method..."></textarea>
+        <textarea id="description" name="description" rows="5" placeholder="Item condition, location, delivery terms, payment method..."></textarea>
       </div>
 
       <div class="form-row">
@@ -167,24 +185,24 @@
 
   <div class="payment-summary-box">
     <div class="row">
-      <span>Item Value (₦)</span>
+      <span>Item Value (NGN)</span>
       <strong id="display-value">0</strong>
     </div>
     <div class="row">
       <span>Service Fee (5% per week)</span>
-      <strong id="display-service-fee">₦0</strong>
+      <strong id="display-service-fee">NGN 0</strong>
     </div>
     <div class="row" id="extra-fee-row" style="display:none;">
       <span>Extra 5% (extended plan)</span>
-      <strong id="display-extra-fee">₦0</strong>
+      <strong id="display-extra-fee">NGN 0</strong>
     </div>
     <div class="row">
       <span>VAT (7.5%)</span>
-      <strong id="display-vat">₦0</strong>
+      <strong id="display-vat">NGN 0</strong>
     </div>
     <div class="row total">
       <span>Total Amount to Pay</span>
-      <strong id="display-total">₦0</strong>
+      <strong id="display-total">NGN 0</strong>
     </div>
   </div>
 
@@ -216,11 +234,11 @@
     <h4>Payment Schedule Preview</h4>
     <div class="breakdown-row">
       <span>Upfront (50% of total)</span>
-      <strong id="upfront-amount">₦0</strong>
+      <strong id="upfront-amount">NGN 0</strong>
     </div>
     <div class="breakdown-row">
       <span>Weekly payment (× <span id="weekly-count">0</span>)</span>
-      <strong id="weekly-amount">₦0</strong>
+      <strong id="weekly-amount">NGN 0</strong>
     </div>
   </div>
 

@@ -8,8 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Date;
 
 
 @Getter
@@ -29,14 +29,21 @@ public class User {
     private String email;
     private String username;
     private String password;
+    @Transient
     private String confirmPassword;
     private String address;
     private LocalDate dateOfBirth;
     private String role;
     private boolean enabled;
+    private int failedLoginAttempts;
+    private Instant lockoutUntil;
+    private String profileImageUrl;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] profileImage;
+    private String profileImageContentType;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creation;
+    private Instant creation;
 
 
 }
