@@ -25,6 +25,8 @@ const form = document.getElementById('new-deal-form');
 const modal = document.getElementById('create-deal-modal');
 const dealsMessage = document.getElementById('deals-message');
 const API_DEALS = '/api/deals';
+const MAX_PHOTO_BYTES = 10 * 1024 * 1024; // 10MB
+const REQUEST_TIMEOUT_MS = 30000;
 
 function openModal() {
   if (!modal) return;
@@ -44,7 +46,10 @@ async function loadDeals() {
   dealsList.innerHTML = '';
   if (dealsMessage) dealsMessage.textContent = '';
   try {
-    const res = await fetch(API_DEALS, { headers: { 'Accept': 'application/json' } });
+    const res = await fetch(API_DEALS, {
+      headers: { 'Accept': 'application/json' },
+      credentials: 'same-origin'
+    });
     if (!res.ok) {
       if (dealsMessage) {
         dealsMessage.textContent = res.status === 401
@@ -86,10 +91,24 @@ async function loadDeals() {
 }
 
 async function saveDeal(formData) {
-  const res = await fetch(API_DEALS, {
-    method: 'POST',
-    body: formData
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let res;
+  try {
+    res = await fetch(API_DEALS, {
+      method: 'POST',
+      body: formData,
+      credentials: 'same-origin',
+      signal: controller.signal
+    });
+  } catch (err) {
+    if (err && err.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
 
   const contentType = res.headers.get('content-type') || '';
   const data = contentType.includes('application/json')
@@ -112,9 +131,14 @@ form?.addEventListener('submit', async e => {
   const title = formData.get('deal-title');
   const client = formData.get('client-name');
   const value = formData.get('deal-value');
+  const photo = formData.get('itemPhoto');
 
   if (!title || !client || !value) {
     if (dealsMessage) dealsMessage.textContent = 'Please fill all required fields.';
+    return;
+  }
+  if (photo && photo.size && photo.size > MAX_PHOTO_BYTES) {
+    if (dealsMessage) dealsMessage.textContent = 'Image is too large. Max 10MB.';
     return;
   }
 
