@@ -21,6 +21,11 @@ public class ProfileController {
         this.userRepository = userRepository;
     }
 
+    @GetMapping("/profile")
+    public String profile() {
+        return "redirect:/dashboard";
+    }
+
     @PostMapping("/profile/upload")
     public String uploadProfileImage(@RequestParam("profileImage") MultipartFile file,
                                      Principal principal) throws IOException {

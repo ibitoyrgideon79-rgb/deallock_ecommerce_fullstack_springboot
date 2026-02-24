@@ -36,7 +36,7 @@ public class SecurityConfig {
                                 "/frontend/**"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/profile").hasRole("USER")
+                        .requestMatchers("/profile", "/profile/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
