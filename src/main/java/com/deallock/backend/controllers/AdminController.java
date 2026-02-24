@@ -4,6 +4,8 @@ import com.deallock.backend.entities.Deal;
 import com.deallock.backend.repositories.DealRepository;
 import com.deallock.backend.repositories.UserRepository;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.security.Principal;
 import org.springframework.stereotype.Controller;
@@ -27,8 +29,22 @@ public class AdminController {
     @GetMapping("/admin")
     public String admin(Model model,
                         @RequestParam(value = "message", required = false) String message,
+                        @RequestParam(value = "start", required = false) String start,
+                        @RequestParam(value = "end", required = false) String end,
                         Principal principal) {
-        List<Deal> allDeals = dealRepository.findAll();
+        List<Deal> allDeals;
+        if ((start != null && !start.isBlank()) || (end != null && !end.isBlank())) {
+            ZoneId zone = ZoneId.systemDefault();
+            Instant startInstant = start != null && !start.isBlank()
+                    ? LocalDate.parse(start).atStartOfDay(zone).toInstant()
+                    : Instant.EPOCH;
+            Instant endInstant = end != null && !end.isBlank()
+                    ? LocalDate.parse(end).plusDays(1).atStartOfDay(zone).toInstant()
+                    : Instant.now().plusSeconds(60L * 60L * 24L * 365L * 10L);
+            allDeals = dealRepository.findByCreatedAtBetweenOrderByCreatedAtDesc(startInstant, endInstant);
+        } else {
+            allDeals = dealRepository.findAllByOrderByCreatedAtDesc();
+        }
         model.addAttribute("pendingDeals", allDeals.stream()
                 .filter(d -> d.getStatus() == null || "Pending Approval".equalsIgnoreCase(d.getStatus()))
                 .toList());
@@ -39,6 +55,8 @@ public class AdminController {
                 .filter(d -> "Rejected".equalsIgnoreCase(d.getStatus()))
                 .toList());
         model.addAttribute("message", message);
+        model.addAttribute("start", start);
+        model.addAttribute("end", end);
         model.addAttribute("now", Instant.now());
         if (principal != null) {
             userRepository.findByEmail(principal.getName()).ifPresent(user -> {
@@ -65,5 +83,18 @@ public class AdminController {
             dealRepository.save(deal);
         });
         return "redirect:/admin?message=rejected";
+    }
+
+    @PostMapping("/admin/deals/{id}/delete")
+    public String delete(@PathVariable("id") Long id,
+                         @RequestParam(value = "start", required = false) String start,
+                         @RequestParam(value = "end", required = false) String end) {
+        dealRepository.deleteById(id);
+        if (start != null || end != null) {
+            String startParam = start == null ? "" : start;
+            String endParam = end == null ? "" : end;
+            return "redirect:/admin?message=deleted&start=" + startParam + "&end=" + endParam;
+        }
+        return "redirect:/admin?message=deleted";
     }
 }
