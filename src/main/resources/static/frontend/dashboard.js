@@ -48,8 +48,14 @@ async function loadDeals() {
   try {
     const res = await fetch(API_DEALS, {
       headers: { 'Accept': 'application/json' },
-      credentials: 'same-origin'
+      credentials: 'include',
+      redirect: 'follow',
+      cache: 'no-store'
     });
+    if (res.redirected || (res.url && res.url.includes('/login'))) {
+      if (dealsMessage) dealsMessage.textContent = 'Session expired. Please log in again.';
+      return;
+    }
     if (!res.ok) {
       if (dealsMessage) {
         dealsMessage.textContent = res.status === 401
@@ -98,7 +104,8 @@ async function saveDeal(formData) {
     res = await fetch(API_DEALS, {
       method: 'POST',
       body: formData,
-      credentials: 'same-origin',
+      credentials: 'include',
+      redirect: 'follow',
       signal: controller.signal
     });
   } catch (err) {
