@@ -24,6 +24,7 @@ const dealsList = document.getElementById('deals-list');
 const form = document.getElementById('new-deal-form');
 const modal = document.getElementById('create-deal-modal');
 const dealStatus = document.getElementById('deal-status');
+const dealsMessage = document.getElementById('deals-message');
 const API_DEALS = '/api/deals';
 
 function openModal() {
@@ -42,10 +43,17 @@ function closeModal() {
 
 async function loadDeals() {
   dealsList.innerHTML = '';
+  if (dealsMessage) dealsMessage.textContent = '';
   try {
     const res = await fetch(API_DEALS, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) {
-      dealsList.innerHTML = '<div class="no-deals">Could not load deals</div>';
+      if (dealsMessage) {
+        dealsMessage.textContent = res.status === 401
+          ? 'Please log in again to view your deals.'
+          : 'Could not load deals.';
+      } else {
+        dealsList.innerHTML = '<div class="no-deals">Could not load deals</div>';
+      }
       return;
     }
     const deals = await res.json();
@@ -56,7 +64,7 @@ async function loadDeals() {
     deals.forEach(deal => {
       const card = document.createElement('div');
       const status = (deal.status || 'Pending Approval');
-      card.className = `deal-card ${status.toLowerCase().replace(' ', '-')}`;
+      card.className = `deal-card ${status.toLowerCase().replace(/\s+/g, '-')}`;
       card.dataset.dealId = deal.id;
       card.dataset.status = status;
       card.innerHTML = `
@@ -66,8 +74,13 @@ async function loadDeals() {
       `;
       dealsList.appendChild(card);
     });
+    makeDealsClickable();
   } catch (e) {
-    dealsList.innerHTML = '<div class="no-deals">Could not load deals</div>';
+    if (dealsMessage) {
+      dealsMessage.textContent = 'Could not load deals.';
+    } else {
+      dealsList.innerHTML = '<div class="no-deals">Could not load deals</div>';
+    }
   }
 }
 
@@ -103,15 +116,20 @@ form?.addEventListener('submit', async e => {
   }
 
   try {
-    if (dealStatus) dealStatus.textContent = 'Saving deal...';
+    if (dealStatus) {
+      dealStatus.style.display = 'block';
+      dealStatus.textContent = 'Saving deal...';
+    }
     await saveDeal(formData);
     closeModal();
     form.reset();
-    if (dealStatus) {
-      dealStatus.textContent = 'Deal created! It is now Pending Approval.';
+    if (dealStatus) dealStatus.style.display = 'none';
+    if (dealsMessage) {
+      dealsMessage.textContent = 'Deal created! It is now Pending Approval.';
     }
   } catch (err) {
     if (dealStatus) {
+      dealStatus.style.display = 'block';
       dealStatus.textContent = err.message || 'Failed to create deal';
     }
   }
