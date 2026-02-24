@@ -38,4 +38,12 @@ public class EmailService {
     public void sendPasswordResetLink(String email, String link) {
         send(email, "Reset your password", "Click: " + link);
     }
+
+    public void sendDealCreatedToAdmin(String email, String details) {
+        send(email, "New Deal Created", details);
+    }
+
+    public void sendDealCreatedToUser(String email, String details) {
+        send(email, "Your Deal Was Created", details);
+    }
 }

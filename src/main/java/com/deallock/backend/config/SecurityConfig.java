@@ -52,7 +52,12 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
+                        .logoutRequestMatcher(request ->
+                                "GET".equalsIgnoreCase(request.getMethod())
+                                        && "/logout".equals(request.getServletPath()))
                         .logoutSuccessUrl("/dashboard")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
                 .build();

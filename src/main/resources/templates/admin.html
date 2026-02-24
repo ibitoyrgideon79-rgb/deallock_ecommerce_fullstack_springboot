@@ -5,7 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/frontend/style.css">
   <link rel="stylesheet" href="/frontend/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <title>Admin - DealLock</title>
+  <style>
+    .admin-section-title {
+      color: #ffffff;
+      background: #0f1b2b;
+      padding: 8px 12px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+    .header-links {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      color: #e2e8f0;
+    }
+    .header-links a {
+      color: #e2e8f0;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+    .header-links a:hover {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -16,17 +42,61 @@
         </a>
         <span class="slogan">Admin Dashboard</span>
       </div>
-      <ul class="nav-links">
+      <div class="header-links">
+        <a href="/dashboard">User Dashboard</a>
+        <a href="/profile">Profile</a>
+        <a href="/admin">Admin Console</a>
+        <a href="/logout">Log out</a>
+      </div>
+      <div class="menu-toggle" id="menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <ul class="nav-links" id="nav-links">
+        <button class="nav-close" id="nav-close" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
         <li><a href="/">Home</a></li>
         <li><a href="/dashboard">User Dashboard</a></li>
+        <li><a href="/profile">Profile</a></li>
+        <li><a href="/admin">Admin Console</a></li>
         <li><a href="/logout">Log out</a></li>
+        <li class="admin-label" style="color:#e2e8f0; font-weight:600;">
+          <span th:text="${currentUser != null && currentUser.fullName != null ? ((#strings.startsWith(currentUser.fullName, 'Admin ') ? currentUser.fullName : ('Admin ' + currentUser.fullName))) : (currentUser != null ? ('Admin ' + currentUser.email) : 'Admin')}">Admin</span>
+        </li>
+        <li class="user-menu-item">
+          <button type="button" class="user-trigger" aria-label="User menu">
+            <img 
+              th:src="${currentUser != null && currentUser.profileImage != null ? '/profile/image' : '/frontend/logo.jpeg'}"
+              src="/frontend/logo.jpeg"
+              alt="User avatar" 
+              class="user-avatar"
+            >
+            <span class="username"
+                  th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName : (currentUser != null ? currentUser.email : 'Admin')}">Admin</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+
+          <div class="user-dropdown-menu">
+            <a href="/profile" class="dropdown-link">
+              <i class="fas fa-user"></i> Profile
+            </a>
+            <a href="/admin" class="dropdown-link">
+              <i class="fas fa-shield-alt"></i> Admin Console
+            </a>
+            <a href="/dashboard" class="dropdown-link">
+              <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="/logout" class="dropdown-link logout">
+              <i class="fas fa-sign-out-alt"></i> Log out
+            </a>
+          </div>
+        </li>
       </ul>
     </nav>
   </header>
 
   <main class="dashboard-container" style="padding: 24px;">
     <section style="width:100%;">
-      <h2 style="margin-bottom:16px;">Pending Deals</h2>
+      <h2 class="admin-section-title" style="margin-bottom:16px;">Pending Deals</h2>
 
       <div th:if="${message}" class="signup-error" style="margin-bottom:12px;">
         <span th:if="${message == 'approved'}">Deal approved.</span>
@@ -44,6 +114,10 @@
           <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
           <div class="deal-status" th:text="${deal.clientName}">Client</div>
           <div class="deal-status" th:text="${deal.link}">Link</div>
+          <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
+            <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
+                 style="max-width:220px; border-radius:10px;">
+          </div>
 
           <div style="margin-top:10px; display:flex; gap:10px;">
             <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
@@ -61,7 +135,7 @@
     </section>
 
     <section style="width:100%; margin-top:28px;">
-      <h2 style="margin-bottom:16px;">Approved Deals</h2>
+      <h2 class="admin-section-title" style="margin-bottom:16px;">Approved Deals</h2>
       <div th:if="${#lists.isEmpty(approvedDeals)}">
         <p>No approved deals yet.</p>
       </div>
@@ -72,6 +146,10 @@
           <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
           <div class="deal-status" th:text="${deal.clientName}">Client</div>
           <div class="deal-status" th:text="${deal.link}">Link</div>
+          <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
+            <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
+                 style="max-width:220px; border-radius:10px;">
+          </div>
           <div style="margin-top:10px;">
             <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
           </div>
@@ -80,7 +158,7 @@
     </section>
 
     <section style="width:100%; margin-top:28px;">
-      <h2 style="margin-bottom:16px;">Rejected Deals</h2>
+      <h2 class="admin-section-title" style="margin-bottom:16px;">Rejected Deals</h2>
       <div th:if="${#lists.isEmpty(rejectedDeals)}">
         <p>No rejected deals yet.</p>
       </div>
@@ -91,6 +169,10 @@
           <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
           <div class="deal-status" th:text="${deal.clientName}">Client</div>
           <div class="deal-status" th:text="${deal.link}">Link</div>
+          <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
+            <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
+                 style="max-width:220px; border-radius:10px;">
+          </div>
           <div style="margin-top:10px;">
             <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
           </div>
@@ -98,5 +180,6 @@
       </div>
     </section>
   </main>
+  <script src="/frontend/home.js" defer></script>
 </body>
 </html>

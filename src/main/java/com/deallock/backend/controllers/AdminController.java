@@ -2,8 +2,10 @@ package com.deallock.backend.controllers;
 
 import com.deallock.backend.entities.Deal;
 import com.deallock.backend.repositories.DealRepository;
+import com.deallock.backend.repositories.UserRepository;
 import java.time.Instant;
 import java.util.List;
+import java.security.Principal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +17,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AdminController {
 
     private final DealRepository dealRepository;
+    private final UserRepository userRepository;
 
-    public AdminController(DealRepository dealRepository) {
+    public AdminController(DealRepository dealRepository, UserRepository userRepository) {
         this.dealRepository = dealRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/admin")
-    public String admin(Model model, @RequestParam(value = "message", required = false) String message) {
+    public String admin(Model model,
+                        @RequestParam(value = "message", required = false) String message,
+                        Principal principal) {
         List<Deal> allDeals = dealRepository.findAll();
         model.addAttribute("pendingDeals", allDeals.stream()
                 .filter(d -> d.getStatus() == null || "Pending Approval".equalsIgnoreCase(d.getStatus()))
@@ -34,6 +40,12 @@ public class AdminController {
                 .toList());
         model.addAttribute("message", message);
         model.addAttribute("now", Instant.now());
+        if (principal != null) {
+            userRepository.findByEmail(principal.getName()).ifPresent(user -> {
+                model.addAttribute("currentUser", user);
+                model.addAttribute("isAdmin", "ROLE_ADMIN".equals(user.getRole()));
+            });
+        }
         return "admin";
     }
 

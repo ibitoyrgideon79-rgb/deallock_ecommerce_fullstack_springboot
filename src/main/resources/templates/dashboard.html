@@ -8,6 +8,24 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="icon" type="image/x-icon" href="/frontend/logo.jpeg">
   <title>deallock.ng</title>
+  <style>
+    .header-links {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      color: #e2e8f0;
+    }
+    .header-links a {
+      color: #e2e8f0;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+    .header-links a:hover {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+    }
+  </style>
 </head>
 <body>
 
@@ -18,6 +36,12 @@
           <img src="/frontend/logo.jpeg" alt="DealLock Logo">
         </a>
         <span class="slogan">Deal Securing & Purchase Support</span>
+      </div>
+      <div class="header-links">
+        <a href="/dashboard">User Dashboard</a>
+        <a href="/profile">Profile</a>
+        <a href="/admin" th:if="${isAdmin}">Admin Console</a>
+        <a href="/logout">Log out</a>
       </div>
 
       <div class="menu-toggle" id="menu-toggle">
@@ -32,6 +56,9 @@
         <li><a href="/#how-it-works">How It Works</a></li>
         <li><a href="/terms">Terms and Conditions</a></li>
         <li><a href="#footer">Contact Us</a></li>
+        <li class="admin-label" th:if="${isAdmin}" style="color:#e2e8f0; font-weight:600;">
+          <span th:text="${currentUser != null && currentUser.fullName != null ? ((#strings.startsWith(currentUser.fullName, 'Admin ') ? currentUser.fullName : ('Admin ' + currentUser.fullName))) : (currentUser != null ? ('Admin ' + currentUser.email) : 'Admin')}">Admin</span>
+        </li>
             <li class="user-menu-item">
               <button type="button" class="user-trigger" aria-label="User menu">
                 <img 
@@ -40,7 +67,10 @@
                   alt="User avatar" 
                   class="user-avatar"
                 >
-                <span class="username" th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName : (currentUser != null ? currentUser.username : 'User')}">User</span>
+                <span class="username" th:if="${isAdmin}"
+                      th:text="${currentUser != null && currentUser.fullName != null ? ((#strings.startsWith(currentUser.fullName, 'Admin ') ? currentUser.fullName : ('Admin ' + currentUser.fullName))) : (currentUser != null ? ('Admin ' + currentUser.email) : 'Admin')}">Admin</span>
+                <span class="username" th:if="${!isAdmin}"
+                      th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName : (currentUser != null ? currentUser.username : 'User')}">User</span>
                 <i class="fas fa-chevron-down chevron"></i>
               </button>
 
@@ -80,7 +110,11 @@
         >
       </div>
       <h2 class="greeting">
-        Hi, <span class="username" th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName : (currentUser != null ? currentUser.username : 'User')}">User</span>
+        Hi,
+        <span class="username" th:if="${isAdmin}"
+              th:text="${currentUser != null && currentUser.fullName != null ? ((#strings.startsWith(currentUser.fullName, 'Admin ') ? currentUser.fullName : ('Admin ' + currentUser.fullName))) : (currentUser != null ? ('Admin ' + currentUser.email) : 'Admin')}">Admin</span>
+        <span class="username" th:if="${!isAdmin}"
+              th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName : (currentUser != null ? currentUser.username : 'User')}">User</span>
       </h2>
     </div>
 
