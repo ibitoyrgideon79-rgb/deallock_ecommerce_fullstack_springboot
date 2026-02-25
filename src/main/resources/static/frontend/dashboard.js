@@ -74,7 +74,9 @@ async function loadDeals() {
     deals.forEach(deal => {
       const card = document.createElement('div');
       const status = (deal.status || 'Pending Approval');
-      const isApproved = status.toLowerCase() === 'approved';
+      const statusLower = status.toLowerCase();
+      const isApproved = statusLower === 'approved';
+      const isPending = statusLower.includes('pending');
       card.className = `deal-card ${status.toLowerCase().replace(/\s+/g, '-')}`;
       card.dataset.dealId = deal.id;
       card.dataset.status = status;
@@ -82,11 +84,15 @@ async function loadDeals() {
         <div class="deal-title">${deal.title || 'Untitled Deal'}</div>
         <div class="deal-status">${status}</div>
         <div class="deal-value">NGN ${Number(deal.value || 0).toLocaleString()}</div>
-        ${isApproved ? `<a class="btn-submit deal-details-link" href="/dashboard/deal/${deal.id}">See Details</a>` : ''}
+        <div class="deal-actions" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+          <a class="btn-submit deal-details-link" href="/dashboard/deal/${deal.id}">See Details</a>
+          ${isPending ? `<button class="btn-cancel cancel-deal-btn" data-deal-id="${deal.id}" type="button">Cancel Deal</button>` : ''}
+        </div>
       `;
       dealsList.appendChild(card);
     });
     makeDealsClickable();
+    wireCancelButtons();
   } catch (e) {
     if (dealsMessage) {
       dealsMessage.textContent = 'Could not load deals.';
@@ -379,6 +385,33 @@ function makeDealsClickable() {
 renderDeals = (deals) => {
   makeDealsClickable();
 };
+
+function wireCancelButtons() {
+  const buttons = document.querySelectorAll('.cancel-deal-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const dealId = btn.getAttribute('data-deal-id');
+      if (!dealId) return;
+      const ok = window.confirm('Are you sure you want to cancel this deal?');
+      if (!ok) return;
+      try {
+        const res = await fetch(`${API_DEALS}/${dealId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+          redirect: 'follow'
+        });
+        if (!res.ok) {
+          if (dealsMessage) dealsMessage.textContent = 'Failed to cancel deal.';
+          return;
+        }
+        if (dealsMessage) dealsMessage.textContent = 'Deal canceled.';
+        await loadDeals();
+      } catch (e) {
+        if (dealsMessage) dealsMessage.textContent = 'Failed to cancel deal.';
+      }
+    });
+  });
+}
 
 
 document.addEventListener('DOMContentLoaded', makeDealsClickable);

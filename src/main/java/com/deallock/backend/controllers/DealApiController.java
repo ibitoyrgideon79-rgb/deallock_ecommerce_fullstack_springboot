@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -132,6 +133,32 @@ public class DealApiController {
             type = MediaType.parseMediaType(deal.getItemPhotoContentType());
         }
         return ResponseEntity.ok().contentType(type).body(deal.getItemPhoto());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteDeal(@PathVariable("id") Long id,
+                                        Principal principal,
+                                        Authentication authentication) {
+        var userOpt = userRepository.findByEmail(principal.getName());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var dealOpt = dealRepository.findById(id);
+        if (dealOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        var deal = dealOpt.get();
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+
+        if (!isAdmin && (deal.getUser() == null || deal.getUser().getId() != userOpt.get().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        dealRepository.deleteById(id);
+        return ResponseEntity.ok(Map.of("message", "Deal deleted"));
     }
 
     private void notifyAdminsAndUserOnCreate(Deal deal) {

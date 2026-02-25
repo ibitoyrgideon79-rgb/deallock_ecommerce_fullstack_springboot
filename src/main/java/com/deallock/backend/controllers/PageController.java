@@ -56,9 +56,6 @@ public class PageController {
             if (deal.getUser() == null || deal.getUser().getId() != userOpt.get().getId()) {
                 return "redirect:/dashboard?deal=not-found";
             }
-            if (!"Approved".equalsIgnoreCase(deal.getStatus())) {
-                return "redirect:/dashboard?deal=not-approved";
-            }
         }
 
         model.addAttribute("deal", deal);
