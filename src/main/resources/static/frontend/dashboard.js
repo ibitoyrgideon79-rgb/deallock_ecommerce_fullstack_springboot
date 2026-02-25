@@ -392,7 +392,8 @@ function confirmCancelDialog() {
     const yesBtn = document.getElementById('confirm-yes');
     const noBtn = document.getElementById('confirm-no');
     if (!overlay || !yesBtn || !noBtn) {
-      resolve(false);
+      const ok = window.confirm('Are you sure you want to cancel this deal?');
+      resolve(ok);
       return;
     }
     const cleanup = () => {
@@ -454,6 +455,14 @@ function wireCancelButtons() {
 }
 
 dealsList?.addEventListener('click', (e) => {
+  const btn = e.target.closest('.cancel-deal-btn');
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  handleCancelDealClick(btn);
+});
+
+document.addEventListener('click', (e) => {
   const btn = e.target.closest('.cancel-deal-btn');
   if (!btn) return;
   e.preventDefault();
