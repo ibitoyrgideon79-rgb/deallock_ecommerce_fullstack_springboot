@@ -421,6 +421,10 @@ async function handleCancelDealClick(btn) {
   if (!dealId) return;
   const ok = await confirmCancelDialog();
   if (!ok) return;
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Canceling...';
+  if (dealsMessage) dealsMessage.textContent = '';
   try {
     const res = await fetch(`${API_DEALS}/${dealId}`, {
       method: 'DELETE',
@@ -429,12 +433,16 @@ async function handleCancelDealClick(btn) {
     });
     if (!res.ok) {
       if (dealsMessage) dealsMessage.textContent = 'Failed to cancel deal.';
+      btn.disabled = false;
+      btn.textContent = originalText;
       return;
     }
     if (dealsMessage) dealsMessage.textContent = 'Deal canceled.';
     await loadDeals();
   } catch (e) {
     if (dealsMessage) dealsMessage.textContent = 'Failed to cancel deal.';
+    btn.disabled = false;
+    btn.textContent = originalText;
   }
 }
 
@@ -447,10 +455,10 @@ function wireCancelButtons() {
 
 dealsList?.addEventListener('click', (e) => {
   const btn = e.target.closest('.cancel-deal-btn');
-  if (btn) {
-    e.preventDefault();
-    handleCancelDealClick(btn);
-  }
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  handleCancelDealClick(btn);
 });
 
 
