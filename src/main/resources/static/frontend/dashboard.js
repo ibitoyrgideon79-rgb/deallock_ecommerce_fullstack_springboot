@@ -386,13 +386,43 @@ renderDeals = (deals) => {
   makeDealsClickable();
 };
 
+function confirmCancelDialog() {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('confirm-overlay');
+    const yesBtn = document.getElementById('confirm-yes');
+    const noBtn = document.getElementById('confirm-no');
+    if (!overlay || !yesBtn || !noBtn) {
+      resolve(false);
+      return;
+    }
+    const cleanup = () => {
+      overlay.classList.remove('active');
+      yesBtn.removeEventListener('click', onYes);
+      noBtn.removeEventListener('click', onNo);
+      overlay.removeEventListener('click', onOverlay);
+    };
+    const onYes = () => { cleanup(); resolve(true); };
+    const onNo = () => { cleanup(); resolve(false); };
+    const onOverlay = (e) => {
+      if (e.target === overlay) {
+        cleanup();
+        resolve(false);
+      }
+    };
+    yesBtn.addEventListener('click', onYes);
+    noBtn.addEventListener('click', onNo);
+    overlay.addEventListener('click', onOverlay);
+    overlay.classList.add('active');
+  });
+}
+
 function wireCancelButtons() {
   const buttons = document.querySelectorAll('.cancel-deal-btn');
   buttons.forEach(btn => {
     btn.addEventListener('click', async () => {
       const dealId = btn.getAttribute('data-deal-id');
       if (!dealId) return;
-      const ok = window.confirm('Are you sure you want to cancel this deal?');
+      const ok = await confirmCancelDialog();
       if (!ok) return;
       try {
         const res = await fetch(`${API_DEALS}/${dealId}`, {

@@ -25,6 +25,37 @@
       background: rgba(59, 130, 246, 0.15);
       color: #60a5fa;
     }
+    .confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .confirm-overlay.active {
+      display: flex;
+    }
+    .confirm-dialog {
+      width: min(420px, 92vw);
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+      color: #0f172a;
+    }
+    .confirm-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .confirm-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
   </style>
 </head>
 <body>
@@ -168,6 +199,17 @@
      <div class="preview-container" id="preview-container" style="display: none;">
       <img id="preview-img" alt="Preview" />
       <button type="button" class="remove-preview" id="remove-preview">×</button>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-overlay" id="confirm-overlay" role="dialog" aria-modal="true">
+  <div class="confirm-dialog">
+    <div class="confirm-title">Cancel deal?</div>
+    <div>Are you sure you want to cancel this deal?</div>
+    <div class="confirm-actions">
+      <button type="button" class="btn-cancel" id="confirm-no">No</button>
+      <button type="button" class="btn-submit" id="confirm-yes">Yes, cancel</button>
     </div>
   </div>
 </div>
