@@ -3,8 +3,10 @@ package com.deallock.backend.controllers;
 import com.deallock.backend.entities.Deal;
 import com.deallock.backend.repositories.DealRepository;
 import com.deallock.backend.repositories.UserRepository;
+import com.deallock.backend.repositories.NotificationRepository;
 import com.deallock.backend.services.EmailService;
 import com.deallock.backend.services.SmsService;
+import com.deallock.backend.services.NotificationService;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -22,17 +24,23 @@ public class AdminController {
 
     private final DealRepository dealRepository;
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
     private final EmailService emailService;
     private final SmsService smsService;
+    private final NotificationService notificationService;
 
     public AdminController(DealRepository dealRepository,
                            UserRepository userRepository,
+                           NotificationRepository notificationRepository,
                            EmailService emailService,
-                           SmsService smsService) {
+                           SmsService smsService,
+                           NotificationService notificationService) {
         this.dealRepository = dealRepository;
         this.userRepository = userRepository;
+        this.notificationRepository = notificationRepository;
         this.emailService = emailService;
         this.smsService = smsService;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/admin")
@@ -71,6 +79,7 @@ public class AdminController {
             userRepository.findByEmail(principal.getName()).ifPresent(user -> {
                 model.addAttribute("currentUser", user);
                 model.addAttribute("isAdmin", "ROLE_ADMIN".equals(user.getRole()));
+                model.addAttribute("notificationCount", notificationRepository.countByUserAndReadFalse(user));
             });
         }
         return "admin";
@@ -82,6 +91,8 @@ public class AdminController {
             deal.setStatus("Approved");
             dealRepository.save(deal);
             notifyApproval(deal);
+            notificationService.notifyUser(deal.getUser(), "Your deal was approved.");
+            notificationService.notifyAdmins("Deal approved: " + safe(deal.getTitle()));
         });
         return "redirect:/admin?message=approved";
     }
@@ -91,6 +102,8 @@ public class AdminController {
         dealRepository.findById(id).ifPresent(deal -> {
             deal.setStatus("Rejected");
             dealRepository.save(deal);
+            notificationService.notifyUser(deal.getUser(), "Your deal was rejected.");
+            notificationService.notifyAdmins("Deal rejected: " + safe(deal.getTitle()));
         });
         return "redirect:/admin?message=rejected";
     }
@@ -100,6 +113,8 @@ public class AdminController {
         dealRepository.findById(id).ifPresent(deal -> {
             deal.setPaymentStatus("PAID_CONFIRMED");
             dealRepository.save(deal);
+            notificationService.notifyUser(deal.getUser(), "Payment confirmed for your deal.");
+            notificationService.notifyAdmins("Payment confirmed: " + safe(deal.getTitle()));
         });
         return "redirect:/admin?message=payment-confirmed";
     }
@@ -109,6 +124,8 @@ public class AdminController {
         dealRepository.findById(id).ifPresent(deal -> {
             deal.setPaymentStatus("NOT_PAID");
             dealRepository.save(deal);
+            notificationService.notifyUser(deal.getUser(), "Payment not received for your deal.");
+            notificationService.notifyAdmins("Payment not received: " + safe(deal.getTitle()));
         });
         return "redirect:/admin?message=payment-not-received";
     }
@@ -119,6 +136,8 @@ public class AdminController {
             deal.setSecured(true);
             deal.setSecuredAt(Instant.now());
             dealRepository.save(deal);
+            notificationService.notifyUser(deal.getUser(), "Your deal has been secured.");
+            notificationService.notifyAdmins("Deal secured: " + safe(deal.getTitle()));
         });
         return "redirect:/admin?message=secured";
     }
