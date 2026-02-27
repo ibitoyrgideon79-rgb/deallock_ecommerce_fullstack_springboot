@@ -10,6 +10,8 @@ public class SignupRequest {
     @NotBlank
     public String address;
     @NotBlank
+    public String phone;
+    @NotBlank
     public String dob;
     @NotBlank
     public String username;

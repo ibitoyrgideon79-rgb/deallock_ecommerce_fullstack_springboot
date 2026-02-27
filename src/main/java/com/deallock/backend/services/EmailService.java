@@ -1,30 +1,59 @@
 package com.deallock.backend.services;
 
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
 
-    private final ObjectProvider<JavaMailSender> mailSenderProvider;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    public EmailService(ObjectProvider<JavaMailSender> mailSenderProvider) {
-        this.mailSenderProvider = mailSenderProvider;
-    }
+    @Value("${emailjs.service-id:}")
+    private String serviceId;
+    @Value("${emailjs.template-id:}")
+    private String templateId;
+    @Value("${emailjs.public-key:}")
+    private String publicKey;
+    @Value("${emailjs.private-key:}")
+    private String privateKey;
 
     private void send(String to, String subject, String text) {
-        JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
-        if (mailSender == null) {
-            System.out.println("[DEV] Email not configured. To: " + to + " | " + subject + " | " + text);
+        if (serviceId == null || serviceId.isBlank()
+                || templateId == null || templateId.isBlank()
+                || publicKey == null || publicKey.isBlank()) {
+            System.out.println("[DEV] EmailJS not configured. To: " + to + " | " + subject + " | " + text);
             return;
         }
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(to);
-        msg.setSubject(subject);
-        msg.setText(text);
-        mailSender.send(msg);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("to_email", to);
+        params.put("subject", subject);
+        params.put("message", text);
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("service_id", serviceId);
+        payload.put("template_id", templateId);
+        payload.put("user_id", publicKey);
+        payload.put("template_params", params);
+        if (privateKey != null && !privateKey.isBlank()) {
+            payload.put("accessToken", privateKey);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
+        try {
+            restTemplate.postForEntity("https://api.emailjs.com/api/v1.0/email/send", entity, String.class);
+        } catch (Exception ex) {
+            System.out.println("[DEV] EmailJS send failed: " + ex.getMessage());
+        }
     }
 
     public void sendOtp(String email, String otp) {
@@ -45,5 +74,13 @@ public class EmailService {
 
     public void sendDealCreatedToUser(String email, String details) {
         send(email, "Your Deal Was Created", details);
+    }
+
+    public void sendDealApprovedToUser(String email, String details) {
+        send(email, "Your Deal Was Approved", details);
+    }
+
+    public void sendDealApprovedToAdmin(String email, String details) {
+        send(email, "Deal Approved", details);
     }
 }

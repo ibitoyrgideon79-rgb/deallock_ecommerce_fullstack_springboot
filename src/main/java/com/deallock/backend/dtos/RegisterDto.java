@@ -23,6 +23,8 @@ public class RegisterDto {
     private String password;
     private String confirmPassword;
     private String address;
+    @NotBlank
+    private String phone;
     private String username;
     private String otp;
     private LocalDate dateOfBirth;

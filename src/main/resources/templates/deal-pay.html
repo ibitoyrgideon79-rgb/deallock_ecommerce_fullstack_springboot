@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/frontend/style.css">
+  <link rel="stylesheet" href="/frontend/dashboard.css">
+  <link rel="icon" type="image/x-icon" href="/frontend/logo.jpeg">
+  <title>Payment - DealLock</title>
+  <style>
+    body { background: #ffffff; color: #111111; }
+    .pay-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .pay-row { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid #f1f5f9; }
+    .pay-row:last-child { border-bottom:none; }
+    .pay-title { font-size: 18px; font-weight: 600; }
+    .pay-actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo-wrapper">
+        <a href="/" class="logo">
+          <img src="/frontend/logo.jpeg" alt="DealLock Logo">
+        </a>
+        <span class="slogan">Payment</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/dashboard">Back to Dashboard</a></li>
+        <li><a href="/logout">Log out</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="dashboard-container" style="padding: 24px;">
+    <div class="pay-card">
+      <div class="pay-title">Transfer to the account below</div>
+      <div style="margin:12px 0; color:#475569;">After transfer, send proof to WhatsApp 07064847204.</div>
+
+      <div class="pay-row"><span>Account Name</span><strong>deallock test account</strong></div>
+      <div class="pay-row"><span>Bank</span><strong>deal lock bank</strong></div>
+      <div class="pay-row"><span>Account No</span><strong>9066462428</strong></div>
+
+      <div class="pay-actions">
+        <button type="button" class="btn-submit" id="mark-paid-btn" th:data-deal-id="${deal.id}">I have paid</button>
+        <button type="button" class="btn-cancel" id="cancel-deal-btn" th:data-deal-id="${deal.id}">Cancel</button>
+      </div>
+      <div id="pay-status" class="signup-error" style="margin-top:10px;"></div>
+    </div>
+  </main>
+
+  <script>
+    const payBtn = document.getElementById('mark-paid-btn');
+    const cancelBtn = document.getElementById('cancel-deal-btn');
+    const payStatus = document.getElementById('pay-status');
+
+    async function post(url) {
+      const res = await fetch(url, { method: 'POST', credentials: 'include' });
+      if (!res.ok) throw new Error('Request failed');
+      return res;
+    }
+
+    payBtn?.addEventListener('click', async () => {
+      payStatus.textContent = '';
+      try {
+        payBtn.disabled = true;
+        payBtn.textContent = 'Processing...';
+        await post(`/api/deals/${payBtn.dataset.dealId}/pay`);
+        window.location.href = `/dashboard/deal/${payBtn.dataset.dealId}/track`;
+      } catch (e) {
+        payStatus.textContent = 'Failed to mark payment. Try again.';
+        payBtn.disabled = false;
+        payBtn.textContent = 'I have paid';
+      }
+    });
+
+    cancelBtn?.addEventListener('click', async () => {
+      const ok = window.confirm('Are you sure you want to cancel this deal?');
+      if (!ok) return;
+      try {
+        await post(`/api/deals/${cancelBtn.dataset.dealId}/cancel`);
+        window.location.href = '/dashboard';
+      } catch (e) {
+        payStatus.textContent = 'Failed to cancel deal.';
+      }
+    });
+  </script>
+</body>
+</html>

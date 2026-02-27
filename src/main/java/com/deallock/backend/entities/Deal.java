@@ -37,6 +37,9 @@ public class Deal {
     private String description;
     private String status;
     private Instant createdAt;
+    private String paymentStatus;
+    private boolean secured;
+    private Instant securedAt;
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")

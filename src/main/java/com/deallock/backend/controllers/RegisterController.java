@@ -47,6 +47,7 @@ public class RegisterController {
                 .email(registerDto.getEmail())
                 .password(passwordEncoder.encode(registerDto.getPassword()))
                 .address(registerDto.getAddress())
+                .phone(registerDto.getPhone())
                 .role("ROLE_USER")
                 .enabled(true)
                 .creation(Instant.now())

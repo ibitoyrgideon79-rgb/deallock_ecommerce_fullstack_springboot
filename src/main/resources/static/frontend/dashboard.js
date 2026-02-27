@@ -77,6 +77,9 @@ async function loadDeals() {
       const statusLower = status.toLowerCase();
       const isApproved = statusLower === 'approved';
       const isPending = statusLower.includes('pending');
+      const paymentStatus = (deal.paymentStatus || 'NOT_PAID').toLowerCase();
+      const isPaymentPending = paymentStatus === 'paid_pending_confirmation';
+      const isPaymentConfirmed = paymentStatus === 'paid_confirmed';
       card.className = `deal-card ${status.toLowerCase().replace(/\s+/g, '-')}`;
       card.dataset.dealId = deal.id;
       card.dataset.status = status;
@@ -86,7 +89,11 @@ async function loadDeals() {
         <div class="deal-value">NGN ${Number(deal.value || 0).toLocaleString()}</div>
         <div class="deal-actions" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
           <a class="btn-submit deal-details-link" href="/dashboard/deal/${deal.id}">See Details</a>
+          <a class="btn-submit deal-details-link" href="/dashboard/deal/${deal.id}/track">Track Deal</a>
+          ${isApproved && !isPaymentConfirmed && !isPaymentPending ? `<a class="btn-submit" href="/dashboard/deal/${deal.id}/pay">Pay</a>` : ''}
+          ${isPaymentPending ? `<span class="deal-status" style="font-weight:600;">Processing</span>` : ''}
           ${isPending ? `<button class="btn-cancel cancel-deal-btn" data-deal-id="${deal.id}" type="button">Cancel Deal</button>` : ''}
+          ${isPaymentConfirmed ? `<span class="deal-status" style="font-weight:600;">Paid</span>` : ''}
         </div>
       `;
       dealsList.appendChild(card);

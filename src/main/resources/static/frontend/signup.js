@@ -23,6 +23,7 @@ const API_BASE = "/api";
         otp:          document.getElementById("otpError"),
         fullName:     document.getElementById("fullNameError"),
         address:      document.getElementById("addressError"),
+        phone:        document.getElementById("phoneError"),
         dob:          document.getElementById("dobError"),
         username:     document.getElementById("usernameError"),
         password:     document.getElementById("passwordError"),
@@ -150,6 +151,7 @@ const API_BASE = "/api";
         const values = {
             fullName:       els.signupForm.fullName.value.trim(),
             address:        els.signupForm.address.value.trim(),
+            phone:          els.signupForm.phone.value.trim(),
             dob:            els.signupForm.dob.value,
             username:       els.signupForm.username.value.trim(),
             email:          els.email.value.trim(),
@@ -165,6 +167,10 @@ const API_BASE = "/api";
         }
         if (values.address.length < 5) {
             showError(errors.address, "Please enter a valid address");
+            valid = false;
+        }
+        if (values.phone.length < 7) {
+            showError(errors.phone, "Please enter a valid phone number");
             valid = false;
         }
         if (!values.dob) {
@@ -204,6 +210,7 @@ const API_BASE = "/api";
                 body: JSON.stringify({
                     fullName: values.fullName,
                     address:  values.address,
+                    phone:    values.phone,
                     dob:      values.dob,
                     username: values.username,
                     email:    values.email,

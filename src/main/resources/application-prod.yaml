@@ -9,28 +9,27 @@ spring:
     password: jqqlgVmhXZiFWPMspGOYFaqAxGfyQALO
   jpa:
     show-sql: false
-    hibernate: 
-     ddl-auto: update
+    hibernate:
+      ddl-auto: update
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: root
-    password: jqqlgVmhXZiFWPMspGOYFaqAxGfyQALO
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
 app:
-  base-url: jdbc:mysql://mysql-uavu.railway.internal:3306/railway?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true
+  base-url: https://deallockecommercefullstackspringboot-production.up.railway.app
+  admin-phones: ""
 
+emailjs:
+  service-id: service_1zcjm5s
+  template-id: template_q5fd69o
+  public-key: BAh34rQaol2wbi-fC
+  private-key: yIYRSv0JkxnjeBGgSO9nP
+
+twilio:
+  account-sid: ""
+  auth-token: ""
+  phone-number: ""
 
 server:
   forward-headers-strategy: native
@@ -40,4 +39,3 @@ server:
         http-only: true
         secure: true
         same-site: strict
-

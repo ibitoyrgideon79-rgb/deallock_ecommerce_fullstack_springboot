@@ -123,6 +123,7 @@ public class AuthApiController {
                 .username(req.username)
                 .password(passwordEncoder.encode(req.password))
                 .address(req.address)
+                .phone(req.phone)
                 .dateOfBirth(LocalDate.parse(req.dob))
                 .role("ROLE_USER")
                 .enabled(false)

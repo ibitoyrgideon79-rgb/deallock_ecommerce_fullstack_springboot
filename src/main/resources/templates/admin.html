@@ -77,6 +77,9 @@
         <span th:if="${message == 'approved'}">Deal approved.</span>
         <span th:if="${message == 'rejected'}">Deal rejected.</span>
         <span th:if="${message == 'deleted'}">Deal deleted.</span>
+        <span th:if="${message == 'payment-confirmed'}">Payment confirmed.</span>
+        <span th:if="${message == 'payment-not-received'}">Payment not received.</span>
+        <span th:if="${message == 'secured'}">Deal secured.</span>
       </div>
 
       <div th:if="${#lists.isEmpty(pendingDeals)}">
@@ -132,12 +135,33 @@
           <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
           <div class="deal-status" th:text="${deal.clientName}">Client</div>
           <div class="deal-status" th:text="${deal.link}">Link</div>
+          <div class="deal-status" th:text="${deal.paymentStatus != null ? deal.paymentStatus : 'NOT_PAID'}">Payment</div>
           <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
             <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
                  style="max-width:220px; border-radius:10px;">
           </div>
           <div style="margin-top:10px;">
             <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+              <form th:action="@{'/admin/deals/' + ${deal.id} + '/payment-confirmed'}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="hidden" name="start" th:value="${start}"/>
+                <input type="hidden" name="end" th:value="${end}"/>
+                <button type="submit" class="btn-submit">Payment Confirmed</button>
+              </form>
+              <form th:action="@{'/admin/deals/' + ${deal.id} + '/payment-not-received'}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="hidden" name="start" th:value="${start}"/>
+                <input type="hidden" name="end" th:value="${end}"/>
+                <button type="submit" class="btn-cancel">Payment Not Received</button>
+              </form>
+              <form th:action="@{'/admin/deals/' + ${deal.id} + '/secured'}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="hidden" name="start" th:value="${start}"/>
+                <input type="hidden" name="end" th:value="${end}"/>
+                <button type="submit" class="btn-submit">Deal Secured</button>
+              </form>
+            </div>
             <form th:action="@{'/admin/deals/' + ${deal.id} + '/delete'}" method="post" style="margin-top:8px;" onsubmit="return confirm('Delete this deal?');">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
               <input type="hidden" name="start" th:value="${start}"/>

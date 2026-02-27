@@ -54,6 +54,13 @@
                 <div class="signup-error" id="addressError"></div>
             </div>
 
+
+            <div class="signup-form-group">
+                <label class="signup-label">Phone Number</label>
+                <input th:field="${registerDto.phone}" class="signup-input" type="tel" id="phone" required>
+                <div class="signup-error" id="phoneError"></div>
+            </div>
+
             <div class="signup-form-group">
                 <label class="signup-label">Date of Birth</label>
                 <input th:field="${registerDto.dateOfBirth}" class="signup-input" type="date" id="dob" required>
@@ -184,7 +191,7 @@
     <button type="button" class="back-to-top" aria-label="Back to top"></button>
 
     <div class="footer-bottom">
-      © 2026 DealLock. All rights reserved.
+       2026 DealLock. All rights reserved.
     </div>
   </footer>
 

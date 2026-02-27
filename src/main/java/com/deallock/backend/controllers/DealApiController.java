@@ -57,6 +57,8 @@ public class DealApiController {
                         "title", d.getTitle(),
                         "status", d.getStatus(),
                         "value", d.getValue() == null ? 0 : d.getValue(),
+                        "paymentStatus", d.getPaymentStatus(),
+                        "secured", d.isSecured(),
                         "createdAt", d.getCreatedAt()
                 ))
                 .collect(Collectors.toList());
@@ -86,6 +88,8 @@ public class DealApiController {
         deal.setDescription(description);
         deal.setStatus("Pending Approval");
         deal.setCreatedAt(Instant.now());
+        deal.setPaymentStatus("NOT_PAID");
+        deal.setSecured(false);
 
         if (itemPhoto != null && !itemPhoto.isEmpty()) {
             deal.setItemPhoto(itemPhoto.getBytes());
@@ -166,6 +170,37 @@ public class DealApiController {
                                         Principal principal,
                                         Authentication authentication) {
         return deleteDeal(id, principal, authentication);
+    }
+
+    @PostMapping("/{id}/pay")
+    public ResponseEntity<?> markPaid(@PathVariable("id") Long id,
+                                      Principal principal,
+                                      Authentication authentication) {
+        var userOpt = userRepository.findByEmail(principal.getName());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var dealOpt = dealRepository.findById(id);
+        if (dealOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        var deal = dealOpt.get();
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+
+        if (!isAdmin && (deal.getUser() == null || deal.getUser().getId() != userOpt.get().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        if (deal.getStatus() == null || !"Approved".equalsIgnoreCase(deal.getStatus())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Deal not approved"));
+        }
+
+        deal.setPaymentStatus("PAID_PENDING_CONFIRMATION");
+        dealRepository.save(deal);
+        return ResponseEntity.ok(Map.of("message", "Payment marked as processing"));
     }
 
     private void notifyAdminsAndUserOnCreate(Deal deal) {

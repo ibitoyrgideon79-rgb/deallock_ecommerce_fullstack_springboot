@@ -32,6 +32,7 @@ public class User {
     @Transient
     private String confirmPassword;
     private String address;
+    private String phone;
     private LocalDate dateOfBirth;
     private String role;
     private boolean enabled;

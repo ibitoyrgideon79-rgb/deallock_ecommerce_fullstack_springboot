@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/frontend/style.css">
+  <link rel="stylesheet" href="/frontend/dashboard.css">
+  <link rel="icon" type="image/x-icon" href="/frontend/logo.jpeg">
+  <title>Track Deal - DealLock</title>
+  <style>
+    body { background:#ffffff; color:#111111; }
+    .track-card { max-width: 800px; margin: 0 auto; padding: 20px; border:1px solid #e5e7eb; border-radius:16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+    .track-item { display:flex; gap:12px; align-items:flex-start; margin:12px 0; }
+    .track-dot { width:10px; height:10px; border-radius:50%; margin-top:6px; background:#cbd5e1; }
+    .track-item.active .track-dot { background:#22c55e; }
+    .track-item.blocked .track-dot { background:#ef4444; }
+    .track-title { font-weight:600; }
+    .track-sub { color:#64748b; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo-wrapper">
+        <a href="/" class="logo">
+          <img src="/frontend/logo.jpeg" alt="DealLock Logo">
+        </a>
+        <span class="slogan">Track Deal</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/dashboard">Back to Dashboard</a></li>
+        <li><a href="/logout">Log out</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="dashboard-container" style="padding: 24px;">
+    <div class="track-card">
+      <div class="deal-title" th:text="${deal.title}">Deal Title</div>
+
+      <div class="track-item active">
+        <div class="track-dot"></div>
+        <div>
+          <div class="track-title">Deal sent</div>
+          <div class="track-sub">We received your deal</div>
+        </div>
+      </div>
+
+      <div class="track-item" th:classappend="${deal.status != null && deal.status.toLowerCase().contains('pending')} ? 'active' : ''">
+        <div class="track-dot"></div>
+        <div>
+          <div class="track-title">Awaiting approval</div>
+          <div class="track-sub">Admin reviewing your deal</div>
+        </div>
+      </div>
+
+      <div class="track-item" th:classappend="${deal.status != null && deal.status.equalsIgnoreCase('Approved')} ? 'active' : (${deal.status != null && deal.status.equalsIgnoreCase('Rejected')} ? 'blocked' : '')">
+        <div class="track-dot"></div>
+        <div>
+          <div class="track-title">Deal approved</div>
+          <div class="track-sub" th:text="${deal.status != null && deal.status.equalsIgnoreCase('Rejected')} ? 'Deal rejected' : 'Approved by admin'">Approved by admin</div>
+        </div>
+      </div>
+
+      <div class="track-item" th:classappend="${deal.status != null && deal.status.equalsIgnoreCase('Approved')} ? 'active' : ''">
+        <div class="track-dot"></div>
+        <div>
+          <div class="track-title">Please make payment</div>
+          <div class="track-sub">Transfer to the provided account</div>
+        </div>
+      </div>
+
+      <div class="track-item" th:classappend="${deal.paymentStatus != null && deal.paymentStatus.equalsIgnoreCase('PAID_PENDING_CONFIRMATION')} ? 'active' : ''">
+        <div class="track-dot"></div>
+        <div>
+          <div class="track-title">Payment processing</div>
+          <div class="track-sub">We are verifying your payment</div>
+        </div>
+      </div>
+
+      <div class="track-item" th:classappend="${deal.paymentStatus != null && deal.paymentStatus.equalsIgnoreCase('PAID_CONFIRMED')} ? 'active' : ''">
+        <div class="track-dot"></div>
+        <div>
+          <div class="track-title">Payment confirmed</div>
+          <div class="track-sub">Payment verified by admin</div>
+        </div>
+      </div>
+
+      <div class="track-item" th:classappend="${deal.secured} ? 'active' : ''">
+        <div class="track-dot"></div>
+        <div>
+          <div class="track-title">Deal locked</div>
+          <div class="track-sub" th:text="${deal.secured} ? 'Your deal has been secured' : 'Pending security confirmation'">Pending security confirmation</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

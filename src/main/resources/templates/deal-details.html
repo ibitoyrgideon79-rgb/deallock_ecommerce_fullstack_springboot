@@ -43,6 +43,7 @@
       </div>
       <ul class="nav-links">
         <li><a href="/dashboard">Back to Dashboard</a></li>
+        <li><a th:href="@{'/dashboard/deal/' + ${deal.id} + '/track'}">Track Deal</a></li>
         <li><a href="/logout">Log out</a></li>
       </ul>
     </nav>
