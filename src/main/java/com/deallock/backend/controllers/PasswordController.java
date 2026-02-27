@@ -25,7 +25,7 @@ public class PasswordController {
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
 
-    @Value("${app.base-url}")
+    @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
 
     public PasswordController(PasswordResetTokenRepository resetRepo,

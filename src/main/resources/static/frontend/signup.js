@@ -177,8 +177,14 @@ const API_BASE = "/api";
             showError(errors.dob, "Date of birth is required");
             valid = false;
         } else {
-            const age = new Date().getFullYear() - new Date(values.dob).getFullYear();
-            if (age < 18) {  
+            const dobDate = new Date(values.dob);
+            const today = new Date();
+            let age = today.getFullYear() - dobDate.getFullYear();
+            const m = today.getMonth() - dobDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+                age--;
+            }
+            if (age < 18) {
                 showError(errors.dob, "You must be at least 18 years old");
                 valid = false;
             }

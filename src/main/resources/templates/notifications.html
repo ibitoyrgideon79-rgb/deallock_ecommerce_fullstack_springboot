@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/frontend/style.css">
+  <link rel="stylesheet" href="/frontend/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="icon" type="image/x-icon" href="/frontend/logo.jpeg">
+  <title>Notifications - DealLock</title>
+  <style>
+    body {
+      background: #0f1b2b;
+      color: #f8fafc;
+    }
+    .notification-card {
+      background: #122338;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .notification-time {
+      color: #b6c2d6;
+      font-size: 0.85rem;
+      margin-top: 6px;
+    }
+    .notification-empty {
+      color: #b6c2d6;
+      padding: 12px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo-wrapper">
+        <a href="/" class="logo">
+          <img src="/frontend/logo.jpeg" alt="DealLock Logo">
+        </a>
+        <span class="slogan">Notifications</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/logout">Log out</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="dashboard-container" style="padding: 24px;">
+    <section style="width:100%; max-width:900px; margin:0 auto;">
+      <h2 style="margin-bottom:16px;">Your Notifications</h2>
+
+      <div th:if="${#lists.isEmpty(notifications)}" class="notification-empty">
+        No notifications yet.
+      </div>
+
+      <div th:each="note : ${notifications}" class="notification-card">
+        <div th:text="${note.message}">Notification message</div>
+        <div class="notification-time" th:text="${#temporals.format(note.createdAt, 'yyyy-MM-dd HH:mm')}">Time</div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

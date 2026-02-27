@@ -42,6 +42,10 @@ public class RegisterController {
             model.addAttribute("error", "Passwords do not match.");
             return "register";
         }
+        if (userRepository.findByEmail(registerDto.getEmail()).isPresent()) {
+            model.addAttribute("error", "An account with this email already exists.");
+            return "register";
+        }
         User user = User.builder()
                 .fullName(registerDto.getFullName())
                 .email(registerDto.getEmail())
@@ -49,11 +53,16 @@ public class RegisterController {
                 .address(registerDto.getAddress())
                 .phone(registerDto.getPhone())
                 .role("ROLE_USER")
+                // WARNING: This enables users immediately without email verification.
+                // This is inconsistent with the main signup flow in AuthApiController
+                // and poses a security risk. Consider setting this to 'false' and
+                // implementing an activation flow.
                 .enabled(true)
                 .creation(Instant.now())
                 .build();
         userRepository.save(user);
-        return "register";
+        // Redirect after POST to prevent duplicate submissions
+        return "redirect:/login?registration_success=true";
     }
 
 

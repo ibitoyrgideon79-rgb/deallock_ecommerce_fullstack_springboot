@@ -17,6 +17,7 @@ spring:
 
 app:
   base-url: http://localhost:8080
+  admin-emails: ""
 
 server:
   port: 8080

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -36,7 +37,7 @@ public class AuthApiController {
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
 
-    @Value("${app.base-url}")
+    @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
 
     public AuthApiController(UserRepository userRepository,
@@ -99,6 +100,7 @@ public class AuthApiController {
     }
 
     @PostMapping("/signup")
+    @Transactional
     public ResponseEntity<?> signup(@Validated @RequestBody SignupRequest req, HttpServletRequest request) {
         if (userRepository.findByEmail(req.email).isPresent()) {
             auditLogService.log("SIGNUP", req.email, request, false, "email_exists");
@@ -142,6 +144,9 @@ public class AuthApiController {
 
         String link = baseUrl + "/activate?token=" + token;
         emailService.sendActivationLink(req.email, link);
+
+        // Consume the OTP that was used for verification now that signup is successful
+        otpRepo.delete(entryOpt.get());
 
         auditLogService.log("SIGNUP", req.email, request, true, null);
         return ResponseEntity.ok(Map.of("message", "Account created"));
