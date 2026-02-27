@@ -66,9 +66,9 @@ public class AuthApiController {
 
         otpRepo.save(entry);
 
-        emailService.sendOtp(req.email, otp);
+        // OTP email is sent from the browser (EmailJS) to avoid server-side EmailJS restrictions.
         auditLogService.log("OTP_SENT", req.email, request, true, null);
-        return ResponseEntity.ok(Map.of("message", "OTP sent"));
+        return ResponseEntity.ok(Map.of("message", "OTP generated", "otp", otp));
     }
 
     @PostMapping("/verify-otp")

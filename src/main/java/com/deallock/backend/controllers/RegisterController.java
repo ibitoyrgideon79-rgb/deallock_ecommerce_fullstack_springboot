@@ -25,9 +25,18 @@ public class RegisterController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    @org.springframework.beans.factory.annotation.Value("${emailjs.service-id:}")
+    private String emailjsServiceId;
+    @org.springframework.beans.factory.annotation.Value("${emailjs.template-id:}")
+    private String emailjsTemplateId;
+    @org.springframework.beans.factory.annotation.Value("${emailjs.public-key:}")
+    private String emailjsPublicKey;
     @GetMapping
     public String register(Model model){
         model.addAttribute(new RegisterDto());
+        model.addAttribute("emailjsServiceId", emailjsServiceId);
+        model.addAttribute("emailjsTemplateId", emailjsTemplateId);
+        model.addAttribute("emailjsPublicKey", emailjsPublicKey);
 
         return "register";
     }
