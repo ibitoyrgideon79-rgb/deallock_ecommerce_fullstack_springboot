@@ -33,6 +33,7 @@ public class SecurityConfig {
                                 "/terms",
                                 "/send-otp",
                                 "/ourteam",
+                                "/error",
                                 "/api/send-otp",
                                 "/api/verify-otp",
                                 "/api/signup",

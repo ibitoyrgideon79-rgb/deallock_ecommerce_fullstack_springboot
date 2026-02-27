@@ -143,12 +143,13 @@ public class AuthApiController {
         activationRepo.save(activation);
 
         String link = baseUrl + "/activate?token=" + token;
-        emailService.sendActivationLink(req.email, link);
-
         // Consume the OTP that was used for verification now that signup is successful
         otpRepo.delete(entryOpt.get());
 
         auditLogService.log("SIGNUP", req.email, request, true, null);
-        return ResponseEntity.ok(Map.of("message", "Account created"));
+        return ResponseEntity.ok(Map.of(
+                "message", "Account created",
+                "activationLink", link
+        ));
     }
 }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/frontend/style.css">
+  <link rel="icon" type="image/x-icon" href="/frontend/logo.jpeg">
+  <title>Error - DealLock</title>
+  <style>
+    body {
+      background: #0f1b2b;
+      color: #f8fafc;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .error-card {
+      max-width: 520px;
+      width: 100%;
+      background: #122338;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+    }
+    .error-code {
+      font-size: 2.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .error-message {
+      color: #b6c2d6;
+      margin-bottom: 20px;
+    }
+    .error-actions a {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      background: #22c55e;
+      color: #0a1220;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-card">
+    <div class="error-code" th:text="${'Error ' + statusCode}">Error 500</div>
+    <div class="error-message" th:text="${errorMessage}">Unexpected error</div>
+    <div class="error-actions">
+      <a href="/login">Go to Login</a>
+    </div>
+  </div>
+</body>
+</html>

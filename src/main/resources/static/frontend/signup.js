@@ -270,6 +270,18 @@ const API_BASE = "/api";
                 throw new Error(data.message || "Registration failed");
             }
 
+            const activationLink = data.activationLink;
+            if (activationLink) {
+                const cfg = getEmailJsConfig();
+                if (emailjsReady && cfg.serviceId && cfg.templateId) {
+                    await window.emailjs.send(cfg.serviceId, cfg.templateId, {
+                        to_email: values.email,
+                        subject: "Activate your account",
+                        message: "Click to activate: " + activationLink
+                    });
+                }
+            }
+
             
             els.successPopup.style.display = "flex";
             let sec = 8;
