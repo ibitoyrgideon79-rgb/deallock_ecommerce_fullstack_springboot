@@ -82,10 +82,6 @@ public class AdminController {
                 .toList());
         model.addAttribute("approvedDeals", allDeals.stream()
                 .filter(d -> "Approved".equalsIgnoreCase(d.getStatus()))
-                .filter(d -> !d.isSecured())
-                .filter(d -> d.getPaymentStatus() == null
-                        || (!"PAID_CONFIRMED".equalsIgnoreCase(d.getPaymentStatus())
-                        && !"NOT_PAID".equalsIgnoreCase(d.getPaymentStatus())))
                 .toList());
         model.addAttribute("rejectedDeals", allDeals.stream()
                 .filter(d -> "Rejected".equalsIgnoreCase(d.getStatus()))
