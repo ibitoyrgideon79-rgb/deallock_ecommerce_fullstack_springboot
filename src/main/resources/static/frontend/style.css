@@ -67,7 +67,7 @@ header {
   display: flex;
   gap: 1.6rem;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   row-gap: 0.5rem;
 }
 
@@ -130,7 +130,7 @@ header {
   display: flex;
   justify-content: center;
   gap: 1.2rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .btn {
@@ -376,7 +376,7 @@ h2 {
 
 .sponsors-logos {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   gap: 3rem 4rem;
   align-items: center;
@@ -427,7 +427,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 2rem;              
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .footer-socials {
@@ -965,3 +965,4 @@ h2 {
                 padding: 20px;
             }
 }
+
