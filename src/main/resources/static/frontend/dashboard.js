@@ -26,7 +26,7 @@ const modal = document.getElementById('create-deal-modal');
 const dealsMessage = document.getElementById('deals-message');
 const API_DEALS = '/api/deals';
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024; // 10MB
-const REQUEST_TIMEOUT_MS = 30000;
+const REQUEST_TIMEOUT_MS = 60000;
 
 function openModal() {
   if (!modal) return;
@@ -271,7 +271,6 @@ const customGroup    = document.getElementById('custom-weeks-group');
 const sellerAddressInput = document.getElementById('seller-address');
 const deliveryAddressInput = document.getElementById('delivery-address');
 const itemSizeInput = document.getElementById('item-size');
-const courierPartnerInput = document.getElementById('courier-partner');
 const breakdown      = document.getElementById('breakdown');
 
 const displayValue   = document.getElementById('display-value');
@@ -348,7 +347,6 @@ customWeeks.addEventListener('input', updatePaymentPreview);
 sellerAddressInput?.addEventListener('input', updatePaymentPreview);
 deliveryAddressInput?.addEventListener('input', updatePaymentPreview);
 itemSizeInput?.addEventListener('change', updatePaymentPreview);
-courierPartnerInput?.addEventListener('change', updatePaymentPreview);
 
 
 updatePaymentPreview();
@@ -357,7 +355,6 @@ function estimateLogisticsFee() {
   const itemSize = (itemSizeInput?.value || '').toLowerCase();
   const sellerAddress = (sellerAddressInput?.value || '').toLowerCase();
   const deliveryAddress = (deliveryAddressInput?.value || '').toLowerCase();
-  const courierPartner = (courierPartnerInput?.value || '').toLowerCase();
 
   let baseFee = 5000;
   if (itemSize === 'medium') baseFee = 9000;
@@ -372,12 +369,7 @@ function estimateLogisticsFee() {
     else distanceFactor = 1.65;
   }
 
-  let courierFactor = 1.0;
-  if (courierPartner.includes('gig')) courierFactor = 1.1;
-  else if (courierPartner.includes('kwik')) courierFactor = 1.08;
-  else if (courierPartner.includes('dhl')) courierFactor = 1.2;
-
-  return Math.round(baseFee * distanceFactor * courierFactor);
+  return Math.round(baseFee * distanceFactor);
 }
 
 

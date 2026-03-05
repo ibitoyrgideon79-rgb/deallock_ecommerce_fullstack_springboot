@@ -56,6 +56,15 @@
     .admin-content {
       min-width: 0;
     }
+    .admin-panels {
+      margin-top: 16px;
+    }
+    .admin-panel {
+      display: none;
+    }
+    .admin-panel.is-active {
+      display: block;
+    }
     .admin-top-filter {
       display: flex;
       gap: 12px;
@@ -202,12 +211,12 @@
     <aside class="admin-sidebar">
       <h4>Quick Access</h4>
       <div class="admin-side-nav">
-        <a href="#pending-deals" class="admin-side-link"><i class="fa-regular fa-hourglass-half"></i> Pending Deals</a>
-        <a href="#approved-deals" class="admin-side-link"><i class="fa-regular fa-circle-check"></i> Approved Deals</a>
-        <a href="#confirmed-payments" class="admin-side-link"><i class="fa-solid fa-check-double"></i> Confirmed Payments</a>
-        <a href="#payment-not-received" class="admin-side-link"><i class="fa-regular fa-circle-xmark"></i> Payment Not Received</a>
-        <a href="#secured-deals" class="admin-side-link"><i class="fa-solid fa-lock"></i> Secured Deals</a>
-        <a href="#rejected-deals" class="admin-side-link"><i class="fa-solid fa-ban"></i> Rejected Deals</a>
+        <a href="#pending-deals" class="admin-side-link js-panel-link" data-panel="pending-deals"><i class="fa-regular fa-hourglass-half"></i> Pending Deals</a>
+        <a href="#approved-deals" class="admin-side-link js-panel-link" data-panel="approved-deals"><i class="fa-regular fa-circle-check"></i> Approved Deals</a>
+        <a href="#confirmed-payments" class="admin-side-link js-panel-link" data-panel="confirmed-payments"><i class="fa-solid fa-check-double"></i> Confirmed Payments</a>
+        <a href="#payment-not-received" class="admin-side-link js-panel-link" data-panel="payment-not-received"><i class="fa-regular fa-circle-xmark"></i> Payment Not Received</a>
+        <a href="#secured-deals" class="admin-side-link js-panel-link" data-panel="secured-deals"><i class="fa-solid fa-lock"></i> Secured Deals</a>
+        <a href="#rejected-deals" class="admin-side-link js-panel-link" data-panel="rejected-deals"><i class="fa-solid fa-ban"></i> Rejected Deals</a>
         <a href="/admin/payment-proofs" class="admin-side-link"><i class="fa-regular fa-folder-open"></i> Payment Proofs</a>
       </div>
     </aside>
@@ -224,206 +233,183 @@
         <button type="submit" class="btn-submit">Filter</button>
         <a href="/admin" class="btn-cancel" style="text-decoration:none;">Clear</a>
       </form>
-
-      <h2 id="pending-deals" class="admin-section-title" style="margin-bottom:16px;">Pending Deals</h2>
-
-      <div th:if="${message}" class="signup-error" style="margin-bottom:12px;">
-        <span th:if="${message == 'approved'}">Deal approved.</span>
-        <span th:if="${message == 'rejected'}">Deal rejected.</span>
-        <span th:if="${message == 'deleted'}">Deal deleted.</span>
-        <span th:if="${message == 'payment-confirmed'}">Payment confirmed.</span>
-        <span th:if="${message == 'payment-not-received'}">Payment not received.</span>
-        <span th:if="${message == 'secured'}">Deal secured.</span>
-      </div>
-
-      <div th:if="${#lists.isEmpty(pendingDeals)}">
-        <p>No deals yet.</p>
-      </div>
-
-      <div th:if="${!#lists.isEmpty(pendingDeals)}" style="display:flex; flex-direction:column; gap:12px;">
-        <div th:each="deal : ${pendingDeals}" class="deal-card">
-          <div class="deal-title" th:text="${deal.title}">Deal Title</div>
-          <div class="deal-status" th:text="${deal.status}">Pending Approval</div>
-          <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
-          <div class="deal-status" th:text="${deal.clientName}">Seller</div>
-          <div class="deal-status" th:text="${deal.link}">Link</div>
-          <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
-            <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
-                 style="max-width:220px; border-radius:10px;">
+      <div class="admin-panels">
+        <section class="admin-panel is-active" id="pending-deals">
+          <h2 class="admin-section-title" style="margin-bottom:16px;">Pending Deals</h2>
+          <div th:if="${message}" class="signup-error" style="margin-bottom:12px;">
+            <span th:if="${message == 'approved'}">Deal approved.</span>
+            <span th:if="${message == 'rejected'}">Deal rejected.</span>
+            <span th:if="${message == 'deleted'}">Deal deleted.</span>
+            <span th:if="${message == 'payment-confirmed'}">Payment confirmed.</span>
+            <span th:if="${message == 'payment-not-received'}">Payment not received.</span>
+            <span th:if="${message == 'secured'}">Deal secured.</span>
           </div>
-
-          <div style="margin-top:10px; display:flex; gap:10px;">
-            <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
-            <form th:action="@{'/admin/deals/' + ${deal.id} + '/approve'}" method="post" class="admin-action-form" data-action="approve">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-              <input type="hidden" name="start" th:value="${start}"/>
-              <input type="hidden" name="end" th:value="${end}"/>
-              <button type="submit" class="btn-submit">Approve</button>
-            </form>
-            <form th:action="@{'/admin/deals/' + ${deal.id} + '/reject'}" method="post" class="admin-action-form" data-action="reject">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-              <input type="hidden" name="start" th:value="${start}"/>
-              <input type="hidden" name="end" th:value="${end}"/>
-              <button type="submit" class="btn-cancel">Reject</button>
-            </form>
-            <form th:action="@{'/admin/deals/' + ${deal.id} + '/delete'}" method="post" class="admin-action-form" data-action="delete" onsubmit="return confirm('Delete this deal?');">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-              <input type="hidden" name="start" th:value="${start}"/>
-              <input type="hidden" name="end" th:value="${end}"/>
-              <button type="submit" class="btn-cancel">Delete</button>
-            </form>
+          <div th:if="${#lists.isEmpty(pendingDeals)}">
+            <p>No deals yet.</p>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="admin-block" id="approved-deals">
-      <h2 class="admin-section-title" style="margin-bottom:16px;">Approved Deals</h2>
-      <div th:if="${#lists.isEmpty(approvedDeals)}">
-        <p>No approved deals yet.</p>
-      </div>
-      <div th:if="${!#lists.isEmpty(approvedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
-        <div th:each="deal : ${approvedDeals}" class="deal-card">
-          <div class="deal-title" th:text="${deal.title}">Deal Title</div>
-          <div class="deal-status" th:text="${deal.status}">Approved</div>
-          <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
-          <div class="deal-status" th:text="${deal.clientName}">Seller</div>
-          <div class="deal-status" th:text="${deal.link}">Link</div>
-          <div class="deal-status" th:text="${deal.paymentStatus != null ? deal.paymentStatus : 'NOT_PAID'}">Payment</div>
-          <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
-            <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
-                 style="max-width:220px; border-radius:10px;">
-          </div>
-          <div style="margin-top:10px;">
-            <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-              <form th:action="@{'/admin/deals/' + ${deal.id} + '/payment-confirmed'}" method="post" class="admin-action-form" data-action="payment-confirmed">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <input type="hidden" name="start" th:value="${start}"/>
-                <input type="hidden" name="end" th:value="${end}"/>
-                <button type="submit" class="btn-submit">Payment Confirmed</button>
-              </form>
-              <form th:action="@{'/admin/deals/' + ${deal.id} + '/payment-not-received'}" method="post" class="admin-action-form" data-action="payment-not-received">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <input type="hidden" name="start" th:value="${start}"/>
-                <input type="hidden" name="end" th:value="${end}"/>
-                <button type="submit" class="btn-cancel">Payment Not Received</button>
-              </form>
-              <form th:action="@{'/admin/deals/' + ${deal.id} + '/secured'}" method="post" class="admin-action-form" data-action="secured">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <input type="hidden" name="start" th:value="${start}"/>
-                <input type="hidden" name="end" th:value="${end}"/>
-                <button type="submit" class="btn-submit">Deal Secured</button>
-              </form>
+          <div th:if="${!#lists.isEmpty(pendingDeals)}" style="display:flex; flex-direction:column; gap:12px;">
+            <div th:each="deal : ${pendingDeals}" class="deal-card">
+              <div class="deal-title" th:text="${deal.title}">Deal Title</div>
+              <div class="deal-status" th:text="${deal.status}">Pending Approval</div>
+              <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
+              <div class="deal-status" th:text="${deal.clientName}">Seller</div>
+              <div class="deal-status" th:text="${deal.link}">Link</div>
+              <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
+                <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo" style="max-width:220px; border-radius:10px;">
+              </div>
+              <div style="margin-top:10px; display:flex; gap:10px;">
+                <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
+                <form th:action="@{'/admin/deals/' + ${deal.id} + '/approve'}" method="post" class="admin-action-form" data-action="approve">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <input type="hidden" name="start" th:value="${start}"/>
+                  <input type="hidden" name="end" th:value="${end}"/>
+                  <button type="submit" class="btn-submit">Approve</button>
+                </form>
+                <form th:action="@{'/admin/deals/' + ${deal.id} + '/reject'}" method="post" class="admin-action-form" data-action="reject">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <input type="hidden" name="start" th:value="${start}"/>
+                  <input type="hidden" name="end" th:value="${end}"/>
+                  <button type="submit" class="btn-cancel">Reject</button>
+                </form>
+                <form th:action="@{'/admin/deals/' + ${deal.id} + '/delete'}" method="post" class="admin-action-form" data-action="delete" onsubmit="return confirm('Delete this deal?');">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <input type="hidden" name="start" th:value="${start}"/>
+                  <input type="hidden" name="end" th:value="${end}"/>
+                  <button type="submit" class="btn-cancel">Delete</button>
+                </form>
+              </div>
             </div>
-            <form th:action="@{'/admin/deals/' + ${deal.id} + '/delete'}" method="post" style="margin-top:8px;" class="admin-action-form" data-action="delete" onsubmit="return confirm('Delete this deal?');">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-              <input type="hidden" name="start" th:value="${start}"/>
-              <input type="hidden" name="end" th:value="${end}"/>
-              <button type="submit" class="btn-cancel">Delete</button>
-            </form>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <section class="admin-block" id="confirmed-payments">
-      <h2 class="admin-section-title" style="margin-bottom:16px;">Confirmed Payments</h2>
-      <div th:if="${#lists.isEmpty(paymentConfirmedDeals)}">
-        <p>No confirmed payments yet.</p>
-      </div>
-      <div th:if="${!#lists.isEmpty(paymentConfirmedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
-        <div th:each="deal : ${paymentConfirmedDeals}" class="deal-card">
-          <div class="deal-title" th:text="${deal.title}">Deal Title</div>
-          <div class="deal-status" th:text="${deal.status}">Approved</div>
-          <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
-          <div class="deal-status" th:text="${deal.clientName}">Seller</div>
-          <div class="deal-status" th:text="${deal.link}">Link</div>
-          <div class="deal-status" th:text="${deal.paymentStatus}">Payment</div>
-          <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
-            <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
-                 style="max-width:220px; border-radius:10px;">
+        <section class="admin-panel" id="approved-deals">
+          <h2 class="admin-section-title" style="margin-bottom:16px;">Approved Deals</h2>
+          <div th:if="${#lists.isEmpty(approvedDeals)}"><p>No approved deals yet.</p></div>
+          <div th:if="${!#lists.isEmpty(approvedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
+            <div th:each="deal : ${approvedDeals}" class="deal-card">
+              <div class="deal-title" th:text="${deal.title}">Deal Title</div>
+              <div class="deal-status" th:text="${deal.status}">Approved</div>
+              <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
+              <div class="deal-status" th:text="${deal.clientName}">Seller</div>
+              <div class="deal-status" th:text="${deal.link}">Link</div>
+              <div class="deal-status" th:text="${deal.paymentStatus != null ? deal.paymentStatus : 'NOT_PAID'}">Payment</div>
+              <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
+                <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo" style="max-width:220px; border-radius:10px;">
+              </div>
+              <div style="margin-top:10px;">
+                <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                  <form th:action="@{'/admin/deals/' + ${deal.id} + '/payment-confirmed'}" method="post" class="admin-action-form" data-action="payment-confirmed">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <input type="hidden" name="start" th:value="${start}"/>
+                    <input type="hidden" name="end" th:value="${end}"/>
+                    <button type="submit" class="btn-submit">Payment Confirmed</button>
+                  </form>
+                  <form th:action="@{'/admin/deals/' + ${deal.id} + '/payment-not-received'}" method="post" class="admin-action-form" data-action="payment-not-received">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <input type="hidden" name="start" th:value="${start}"/>
+                    <input type="hidden" name="end" th:value="${end}"/>
+                    <button type="submit" class="btn-cancel">Payment Not Received</button>
+                  </form>
+                  <form th:action="@{'/admin/deals/' + ${deal.id} + '/secured'}" method="post" class="admin-action-form" data-action="secured">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <input type="hidden" name="start" th:value="${start}"/>
+                    <input type="hidden" name="end" th:value="${end}"/>
+                    <button type="submit" class="btn-submit">Deal Secured</button>
+                  </form>
+                </div>
+                <form th:action="@{'/admin/deals/' + ${deal.id} + '/delete'}" method="post" style="margin-top:8px;" class="admin-action-form" data-action="delete" onsubmit="return confirm('Delete this deal?');">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <input type="hidden" name="start" th:value="${start}"/>
+                  <input type="hidden" name="end" th:value="${end}"/>
+                  <button type="submit" class="btn-cancel">Delete</button>
+                </form>
+              </div>
+            </div>
           </div>
-          <div style="margin-top:10px;">
-            <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
-          </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <section class="admin-block" id="payment-not-received">
-      <h2 class="admin-section-title" style="margin-bottom:16px;">Payment Not Received</h2>
-      <div th:if="${#lists.isEmpty(paymentNotReceivedDeals)}">
-        <p>No payment issues logged yet.</p>
-      </div>
-      <div th:if="${!#lists.isEmpty(paymentNotReceivedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
-        <div th:each="deal : ${paymentNotReceivedDeals}" class="deal-card">
-          <div class="deal-title" th:text="${deal.title}">Deal Title</div>
-          <div class="deal-status" th:text="${deal.status}">Approved</div>
-          <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
-          <div class="deal-status" th:text="${deal.clientName}">Seller</div>
-          <div class="deal-status" th:text="${deal.link}">Link</div>
-          <div class="deal-status" th:text="${deal.paymentStatus}">Payment</div>
-          <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
-            <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
-                 style="max-width:220px; border-radius:10px;">
+        <section class="admin-panel" id="confirmed-payments">
+          <h2 class="admin-section-title" style="margin-bottom:16px;">Confirmed Payments</h2>
+          <div th:if="${#lists.isEmpty(paymentConfirmedDeals)}"><p>No confirmed payments yet.</p></div>
+          <div th:if="${!#lists.isEmpty(paymentConfirmedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
+            <div th:each="deal : ${paymentConfirmedDeals}" class="deal-card">
+              <div class="deal-title" th:text="${deal.title}">Deal Title</div>
+              <div class="deal-status" th:text="${deal.status}">Approved</div>
+              <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
+              <div class="deal-status" th:text="${deal.clientName}">Seller</div>
+              <div class="deal-status" th:text="${deal.link}">Link</div>
+              <div class="deal-status" th:text="${deal.paymentStatus}">Payment</div>
+              <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
+                <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo" style="max-width:220px; border-radius:10px;">
+              </div>
+              <div style="margin-top:10px;"><a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a></div>
+            </div>
           </div>
-          <div style="margin-top:10px;">
-            <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
-          </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <section class="admin-block" id="secured-deals">
-      <h2 class="admin-section-title" style="margin-bottom:16px;">Secured Deals</h2>
-      <div th:if="${#lists.isEmpty(securedDeals)}">
-        <p>No secured deals yet.</p>
-      </div>
-      <div th:if="${!#lists.isEmpty(securedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
-        <div th:each="deal : ${securedDeals}" class="deal-card">
-          <div class="deal-title" th:text="${deal.title}">Deal Title</div>
-          <div class="deal-status" th:text="${deal.status}">Approved</div>
-          <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
-          <div class="deal-status" th:text="${deal.clientName}">Seller</div>
-          <div class="deal-status" th:text="${deal.link}">Link</div>
-          <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
-            <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
-                 style="max-width:220px; border-radius:10px;">
+        <section class="admin-panel" id="payment-not-received">
+          <h2 class="admin-section-title" style="margin-bottom:16px;">Payment Not Received</h2>
+          <div th:if="${#lists.isEmpty(paymentNotReceivedDeals)}"><p>No payment issues logged yet.</p></div>
+          <div th:if="${!#lists.isEmpty(paymentNotReceivedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
+            <div th:each="deal : ${paymentNotReceivedDeals}" class="deal-card">
+              <div class="deal-title" th:text="${deal.title}">Deal Title</div>
+              <div class="deal-status" th:text="${deal.status}">Approved</div>
+              <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
+              <div class="deal-status" th:text="${deal.clientName}">Seller</div>
+              <div class="deal-status" th:text="${deal.link}">Link</div>
+              <div class="deal-status" th:text="${deal.paymentStatus}">Payment</div>
+              <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
+                <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo" style="max-width:220px; border-radius:10px;">
+              </div>
+              <div style="margin-top:10px;"><a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a></div>
+            </div>
           </div>
-          <div style="margin-top:10px;">
-            <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
-          </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <section class="admin-block" id="rejected-deals">
-      <h2 class="admin-section-title" style="margin-bottom:16px;">Rejected Deals</h2>
-      <div th:if="${#lists.isEmpty(rejectedDeals)}">
-        <p>No rejected deals yet.</p>
-      </div>
-      <div th:if="${!#lists.isEmpty(rejectedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
-        <div th:each="deal : ${rejectedDeals}" class="deal-card">
-          <div class="deal-title" th:text="${deal.title}">Deal Title</div>
-          <div class="deal-status" th:text="${deal.status}">Rejected</div>
-          <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
-          <div class="deal-status" th:text="${deal.clientName}">Seller</div>
-          <div class="deal-status" th:text="${deal.link}">Link</div>
-          <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
-            <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo"
-                 style="max-width:220px; border-radius:10px;">
+        <section class="admin-panel" id="secured-deals">
+          <h2 class="admin-section-title" style="margin-bottom:16px;">Secured Deals</h2>
+          <div th:if="${#lists.isEmpty(securedDeals)}"><p>No secured deals yet.</p></div>
+          <div th:if="${!#lists.isEmpty(securedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
+            <div th:each="deal : ${securedDeals}" class="deal-card">
+              <div class="deal-title" th:text="${deal.title}">Deal Title</div>
+              <div class="deal-status" th:text="${deal.status}">Approved</div>
+              <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
+              <div class="deal-status" th:text="${deal.clientName}">Seller</div>
+              <div class="deal-status" th:text="${deal.link}">Link</div>
+              <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
+                <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo" style="max-width:220px; border-radius:10px;">
+              </div>
+              <div style="margin-top:10px;"><a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a></div>
+            </div>
           </div>
-          <div style="margin-top:10px;">
-            <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
-            <form th:action="@{'/admin/deals/' + ${deal.id} + '/delete'}" method="post" style="margin-top:8px;" class="admin-action-form" data-action="delete" onsubmit="return confirm('Delete this deal?');">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-              <input type="hidden" name="start" th:value="${start}"/>
-              <input type="hidden" name="end" th:value="${end}"/>
-              <button type="submit" class="btn-cancel">Delete</button>
-            </form>
+        </section>
+
+        <section class="admin-panel" id="rejected-deals">
+          <h2 class="admin-section-title" style="margin-bottom:16px;">Rejected Deals</h2>
+          <div th:if="${#lists.isEmpty(rejectedDeals)}"><p>No rejected deals yet.</p></div>
+          <div th:if="${!#lists.isEmpty(rejectedDeals)}" style="display:flex; flex-direction:column; gap:12px;">
+            <div th:each="deal : ${rejectedDeals}" class="deal-card">
+              <div class="deal-title" th:text="${deal.title}">Deal Title</div>
+              <div class="deal-status" th:text="${deal.status}">Rejected</div>
+              <div class="deal-value" th:text="${'NGN ' + deal.value}">NGN 0</div>
+              <div class="deal-status" th:text="${deal.clientName}">Seller</div>
+              <div class="deal-status" th:text="${deal.link}">Link</div>
+              <div th:if="${deal.itemPhoto != null}" style="margin-top:8px;">
+                <img th:src="@{'/api/deals/' + ${deal.id} + '/photo'}" alt="Deal photo" style="max-width:220px; border-radius:10px;">
+              </div>
+              <div style="margin-top:10px;">
+                <a th:href="@{'/dashboard/deal/' + ${deal.id}}" class="btn-submit">See Deal Details</a>
+                <form th:action="@{'/admin/deals/' + ${deal.id} + '/delete'}" method="post" style="margin-top:8px;" class="admin-action-form" data-action="delete" onsubmit="return confirm('Delete this deal?');">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <input type="hidden" name="start" th:value="${start}"/>
+                  <input type="hidden" name="end" th:value="${end}"/>
+                  <button type="submit" class="btn-cancel">Delete</button>
+                </form>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </section>
   </main>
@@ -452,6 +438,30 @@
         else if (action === 'secured') btn.textContent = 'Securing...';
       });
     });
+
+    const panelLinks = document.querySelectorAll('.js-panel-link');
+    const panels = document.querySelectorAll('.admin-panel');
+
+    function activatePanel(panelId) {
+      panels.forEach(panel => panel.classList.toggle('is-active', panel.id === panelId));
+    }
+
+    panelLinks.forEach(link => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const panelId = link.dataset.panel;
+        if (!panelId) return;
+        activatePanel(panelId);
+        window.history.replaceState(null, '', '#' + panelId);
+      });
+    });
+
+    if (window.location.hash) {
+      const targetId = window.location.hash.replace('#', '');
+      if (document.getElementById(targetId)) {
+        activatePanel(targetId);
+      }
+    }
   </script>
 </body>
 </html>

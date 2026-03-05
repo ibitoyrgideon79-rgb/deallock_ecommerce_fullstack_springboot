@@ -97,6 +97,9 @@ public class DealApiController {
                                         @RequestParam(value = "description", required = false) String description,
                                         @RequestParam(value = "itemPhoto", required = false) MultipartFile itemPhoto,
                                         Principal principal) throws Exception {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         var userOpt = userRepository.findByEmail(principal.getName());
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -155,14 +158,19 @@ public class DealApiController {
             try {
                 notifyAdminsAndUserOnCreate(deal);
             } catch (Exception ignored) {
-                // Avoid blocking the request if email sending fails
+            }
+            try {
+                notificationService.notifyUser(userOpt.get(), "Deal sent. We received your deal.");
+                notificationService.notifyAdmins("New deal submitted: " + safe(deal.getTitle()));
+            } catch (Exception ignored) {
+            }
+            try {
+                if (userOpt.get().getPhone() != null) {
+                    smsService.sendToUser(userOpt.get().getPhone(), "Deal received. Awaiting approval.");
+                }
+            } catch (Exception ignored) {
             }
         });
-        notificationService.notifyUser(userOpt.get(), "Deal sent. We received your deal.");
-        notificationService.notifyAdmins("New deal submitted: " + safe(deal.getTitle()));
-        if (userOpt.get().getPhone() != null) {
-            smsService.sendToUser(userOpt.get().getPhone(), "Deal received. Awaiting approval.");
-        }
         return ResponseEntity.ok(Map.of(
                 "message", "Deal created",
                 "id", deal.getId(),
@@ -383,7 +391,7 @@ public class DealApiController {
                 + "Seller Address: " + safe(deal.getSellerAddress()) + "\n"
                 + "Delivery Address: " + safe(deal.getDeliveryAddress()) + "\n"
                 + "Item Size: " + safe(deal.getItemSize()) + "\n"
-                + "Courier Partner: " + safe(deal.getCourierPartner()) + "\n"
+                + "Courier Partner: Auto-select\n"
                 + "Installment Weeks: " + (deal.getInstallmentWeeks() != null ? deal.getInstallmentWeeks() : 0) + "\n"
                 + "Value: NGN " + (deal.getValue() != null ? deal.getValue() : "0") + "\n"
                 + "Logistics Fee: NGN " + (deal.getLogisticsFeeAmount() != null ? deal.getLogisticsFeeAmount() : "0") + "\n"
@@ -442,17 +450,7 @@ public class DealApiController {
             }
         }
 
-        BigDecimal courierFactor = BigDecimal.valueOf(1.0);
-        String partner = courierPartner == null ? "" : courierPartner.toLowerCase(Locale.ROOT);
-        if (partner.contains("gig")) {
-            courierFactor = BigDecimal.valueOf(1.1);
-        } else if (partner.contains("dhl")) {
-            courierFactor = BigDecimal.valueOf(1.2);
-        } else if (partner.contains("kwik")) {
-            courierFactor = BigDecimal.valueOf(1.08);
-        }
-
-        return roundMoney(baseFee.multiply(distanceFactor).multiply(courierFactor));
+        return roundMoney(baseFee.multiply(distanceFactor));
     }
 
     private BigDecimal roundMoney(BigDecimal amount) {
