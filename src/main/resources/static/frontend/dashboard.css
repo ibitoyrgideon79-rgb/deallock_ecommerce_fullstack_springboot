@@ -2,6 +2,7 @@
 .user-menu-item {
   position: relative;
   list-style: none;
+  margin-top: 180px;
 }
 
 .user-trigger {
@@ -204,6 +205,7 @@
   border-right: 1px solid #e5e7eb;
   padding: 24px 16px;
   flex-shrink: 0;
+  margin-top: 85px;
 }
 
 .sidebar-card {
@@ -232,7 +234,7 @@
   margin: 0 auto 16px;          
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #22c55e;    
+  border: 4px solid #0f172a;    
   background: #f3f4f6;          
   display: flex;                
   align-items: center;
@@ -253,7 +255,7 @@
 }
 
 .username {
-  color: #22c55e;
+  color: #0f172a;
 }
 
 .active-deals-section h3 {
@@ -315,11 +317,12 @@
 .deal-title {
   font-weight: 600;
   margin-bottom: 4px;
+  color: #000000;
 }
 
 .deal-status {
   font-size: 0.85rem;
-  color: #64748b;
+  color: #000000;
 }
 
 .main-content {
@@ -329,6 +332,7 @@
   justify-content: center;
   padding: 40px;
   background: #f9fafb;
+  color: #000000;
 }
 
 .create-deal-card {
@@ -336,7 +340,7 @@
   max-width: 520px;
   aspect-ratio: 5 / 3.2;
   background: white;
-  border: 2px dashed #bbf7d0;
+  border: 2px dashed so #0f172a;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -349,7 +353,7 @@
 }
 
 .create-deal-card:hover {
-  border-color: var(--brand-green-500);
+  border-color: #0f172a;
   background: linear-gradient(180deg, #f7fff9 0%, #effdf3 100%);
   box-shadow: 0 16px 32px rgba(22, 163, 74, 0.15);
   transform: translateY(-6px);
@@ -358,7 +362,7 @@
 .plus-icon {
   font-size: 6.5rem;
   font-weight: 200;
-  color: #22c55e;
+  color: #0f172a;
   line-height: 1;
 }
 
@@ -484,13 +488,13 @@
 }
 
 .btn-submit {
-  background: linear-gradient(180deg, var(--brand-green-500) 0%, var(--brand-green-600) 100%);
+  background: #0f172a;
   color: white;
   box-shadow: 0 8px 18px rgba(22, 163, 74, 0.24);
 }
 
 .btn-submit:hover {
-  background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+  background: #0e162b;
 }
 
 .file-upload-container {
