@@ -26,7 +26,8 @@ header {
   width: 100%;
   background: #0f172a;
   z-index: 1000;
-  padding: 1rem 2rem;
+  padding: 1.25rem 2rem;
+  min-height: 76px;
   border-bottom: 1px solid rgba(59, 69, 95, 0.5);
   backdrop-filter: blur(10px);
 }
@@ -37,6 +38,7 @@ header {
   align-items: center;
   max-width: 1400px;
   margin: 0 auto;
+  min-height: 52px;
 }
 
 .logo-wrapper {
@@ -46,10 +48,11 @@ header {
 }
 
 .logo img {
-  height: 48px;
+  height: 52px;
   width: auto;
   border-radius: 8px;
   display: block;
+  object-fit: contain;
 }
 
 .slogan {
