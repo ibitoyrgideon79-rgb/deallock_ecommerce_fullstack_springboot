@@ -26,9 +26,10 @@
 
       <ul class="nav-links" id="nav-links">
           <button class="nav-close" id="nav-close" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
-        <li><a href="/index">Home</a></li>
+        <li><a href="/">Home</a></li>
         <li><a href="#footer">Contact Us</a></li>
-        <li><a href="/login">Sign In/Sign Up</a></li>
+        <li th:if="${currentUser == null}"><a href="/login">Login</a></li>
+        <li th:if="${currentUser != null}"><a href="/logout">Logout</a></li>
       </ul>
     </nav>
   </header>
