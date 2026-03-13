@@ -325,6 +325,40 @@
     </small>
   </div>
 </div>
+
+      <div class="form-row listing-permission">
+        <label>Item Listing Permission</label>
+        <p class="form-help">Should DealLock list this item on our platform to secure secondary buyers in case you default on the balance payment?</p>
+        <div class="option-card">
+          <label class="option-row">
+            <input type="radio" name="listingPermission" value="YES" required>
+            <span><strong>Yes</strong> – You may list the item</span>
+          </label>
+          <p class="option-sub">
+            This allows DealLock to place the item on our platform with a waitlist option. If the primary buyer fails to complete payment within the agreed timeframe, the item may be reassigned to another interested buyer.
+          </p>
+        </div>
+        <div class="option-card">
+          <label class="option-row">
+            <input type="radio" name="listingPermission" value="NO" required>
+            <span><strong>No</strong> – Do not list the item</span>
+          </label>
+          <p class="option-sub">If you choose No, you agree that the following conditions will apply:</p>
+          <ul class="option-list">
+            <li>Additional default or storage fees may be charged if payment is not completed within the agreed timeframe.</li>
+            <li>A higher administrative deduction may be applied to any refund because DealLock will not be able to secure alternative buyers early.</li>
+          </ul>
+          <p class="option-sub">These measures help protect DealLock from financial loss after securing items on behalf of customers.</p>
+        </div>
+      </div>
+
+      <div class="form-row terms-check">
+        <label class="checkbox-row">
+          <input type="checkbox" id="termsAccepted" required>
+          <span>I have read and agree to the <button type="button" class="terms-link" id="terms-link">Terms and Conditions</button></span>
+        </label>
+      </div>
+
       <div class="form-actions">
         <button type="button" class="btn-cancel" id="cancel-create">Cancel</button>
         <button type="submit" class="btn-submit">Lock Deal</button>
@@ -332,6 +366,16 @@
 
     </form>
 
+  </div>
+</div>
+
+<div class="terms-modal" id="terms-modal" aria-hidden="true">
+  <div class="terms-dialog" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+    <div class="terms-header">
+      <h4 id="terms-title">Terms and Conditions</h4>
+      <button type="button" class="terms-close" id="terms-close" aria-label="Close terms">&times;</button>
+    </div>
+    <iframe class="terms-frame" src="/terms" title="Terms and Conditions"></iframe>
   </div>
 </div>
 
