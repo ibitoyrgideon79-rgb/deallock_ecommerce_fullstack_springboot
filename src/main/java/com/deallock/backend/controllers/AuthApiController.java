@@ -83,15 +83,16 @@ public class AuthApiController {
 
         otpRepo.save(entry);
 
-        if ("phone".equals(channel)) {
-            smsService.sendToUser(req.phone, "Your DealLock OTP is: " + otp);
-            auditLogService.log("OTP_SENT", req.phone, request, true, null);
-            return ResponseEntity.ok(Map.of("message", "OTP sent to phone"));
+        String otpMessage = "Your DealLock OTP is: " + otp;
+        if (req.phone != null && !req.phone.isBlank()) {
+            smsService.sendToUser(req.phone, otpMessage);
+            smsService.sendWhatsAppToUser(req.phone, otpMessage);
         }
-
-        emailService.sendOtp(req.email, otp);
-        auditLogService.log("OTP_SENT", req.email, request, true, null);
-        return ResponseEntity.ok(Map.of("message", "OTP sent to email"));
+        if (req.email != null && !req.email.isBlank()) {
+            emailService.sendOtp(req.email, otp);
+        }
+        auditLogService.log("OTP_SENT", "phone".equals(channel) ? req.phone : req.email, request, true, null);
+        return ResponseEntity.ok(Map.of("message", "OTP sent"));
     }
 
     @PostMapping("/verify-otp")

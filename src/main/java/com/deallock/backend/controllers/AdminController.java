@@ -144,8 +144,10 @@ public class AdminController {
             notificationService.notifyAdmins("Deal rejected: " + safe(deal.getTitle()));
             if (deal.getUser() != null && deal.getUser().getPhone() != null) {
                 smsService.sendToUser(deal.getUser().getPhone(), "Your deal was rejected. Reason: " + safe(reason));
+                smsService.sendWhatsAppToUser(deal.getUser().getPhone(), "Your deal was rejected. Reason: " + safe(reason));
             }
             smsService.sendToAdmins("Deal rejected: " + safe(deal.getTitle()));
+            smsService.sendWhatsAppToAdmins("Deal rejected: " + safe(deal.getTitle()));
             if (deal.getUser() != null && deal.getUser().getEmail() != null) {
                 emailService.sendDealRejectedToUser(deal.getUser().getEmail(),
                         "Your deal was rejected: " + safe(deal.getTitle()) + "\nReason: " + safe(reason));
@@ -163,8 +165,10 @@ public class AdminController {
             notificationService.notifyAdmins("Payment confirmed: " + safe(deal.getTitle()));
             if (deal.getUser() != null && deal.getUser().getPhone() != null) {
                 smsService.sendToUser(deal.getUser().getPhone(), "Payment confirmed for your deal.");
+                smsService.sendWhatsAppToUser(deal.getUser().getPhone(), "Payment confirmed for your deal.");
             }
             smsService.sendToAdmins("Payment confirmed: " + safe(deal.getTitle()));
+            smsService.sendWhatsAppToAdmins("Payment confirmed: " + safe(deal.getTitle()));
             if (deal.getUser() != null && deal.getUser().getEmail() != null) {
                 emailService.sendPaymentConfirmedToUser(deal.getUser().getEmail(),
                         "Payment confirmed for your deal: " + safe(deal.getTitle()));
@@ -182,8 +186,10 @@ public class AdminController {
             notificationService.notifyAdmins("Payment not received: " + safe(deal.getTitle()));
             if (deal.getUser() != null && deal.getUser().getPhone() != null) {
                 smsService.sendToUser(deal.getUser().getPhone(), "Payment not received for your deal.");
+                smsService.sendWhatsAppToUser(deal.getUser().getPhone(), "Payment not received for your deal.");
             }
             smsService.sendToAdmins("Payment not received: " + safe(deal.getTitle()));
+            smsService.sendWhatsAppToAdmins("Payment not received: " + safe(deal.getTitle()));
             if (deal.getUser() != null && deal.getUser().getEmail() != null) {
                 emailService.sendPaymentNotReceivedToUser(deal.getUser().getEmail(),
                         "Payment not received for your deal: " + safe(deal.getTitle()));
@@ -202,8 +208,10 @@ public class AdminController {
             notificationService.notifyAdmins("Deal secured: " + safe(deal.getTitle()));
             if (deal.getUser() != null && deal.getUser().getPhone() != null) {
                 smsService.sendToUser(deal.getUser().getPhone(), "Your deal has been secured.");
+                smsService.sendWhatsAppToUser(deal.getUser().getPhone(), "Your deal has been secured.");
             }
             smsService.sendToAdmins("Deal secured: " + safe(deal.getTitle()));
+            smsService.sendWhatsAppToAdmins("Deal secured: " + safe(deal.getTitle()));
             if (deal.getUser() != null && deal.getUser().getEmail() != null) {
                 emailService.sendDealSecuredToUser(deal.getUser().getEmail(),
                         "Your deal has been secured: " + safe(deal.getTitle()));
@@ -231,14 +239,15 @@ public class AdminController {
                 + "\nValue: NGN " + (deal.getValue() != null ? deal.getValue() : "0")
                 + "\nStatus: " + safe(deal.getStatus());
 
-        if (deal.getUser() != null) {
-            if (deal.getUser().getEmail() != null) {
-                emailService.sendDealApprovedToUser(deal.getUser().getEmail(), details);
+            if (deal.getUser() != null) {
+                if (deal.getUser().getEmail() != null) {
+                    emailService.sendDealApprovedToUser(deal.getUser().getEmail(), details);
+                }
+                if (deal.getUser().getPhone() != null) {
+                    smsService.sendToUser(deal.getUser().getPhone(), "Your deal was approved. Please proceed to payment.");
+                    smsService.sendWhatsAppToUser(deal.getUser().getPhone(), "Your deal was approved. Please proceed to payment.");
+                }
             }
-            if (deal.getUser().getPhone() != null) {
-                smsService.sendToUser(deal.getUser().getPhone(), "Your deal was approved. Please proceed to payment.");
-            }
-        }
 
         userRepository.findByRole("ROLE_ADMIN").forEach(u -> {
             if (u.getEmail() != null) {
@@ -246,6 +255,7 @@ public class AdminController {
             }
         });
         smsService.sendToAdmins("A deal has been approved.");
+        smsService.sendWhatsAppToAdmins("A deal has been approved.");
     }
 
     private String safe(String value) {

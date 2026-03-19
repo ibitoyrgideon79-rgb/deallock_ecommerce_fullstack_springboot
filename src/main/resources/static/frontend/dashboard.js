@@ -210,23 +210,6 @@ modal?.addEventListener('click', e => {
   if (e.target === modal) closeModal();
 });
 
-const termsLink = document.getElementById('terms-link');
-const termsModal = document.getElementById('terms-modal');
-const termsClose = document.getElementById('terms-close');
-
-termsLink?.addEventListener('click', () => {
-  termsModal?.classList.add('active');
-});
-
-termsClose?.addEventListener('click', () => {
-  termsModal?.classList.remove('active');
-});
-
-termsModal?.addEventListener('click', e => {
-  if (e.target === termsModal) {
-    termsModal.classList.remove('active');
-  }
-});
 
 loadDeals();
 

@@ -168,6 +168,7 @@ public class DealApiController {
             try {
                 if (userOpt.get().getPhone() != null) {
                     smsService.sendToUser(userOpt.get().getPhone(), "Deal received. Awaiting approval.");
+                    smsService.sendWhatsAppToUser(userOpt.get().getPhone(), "Deal received. Awaiting approval.");
                 }
             } catch (Exception ignored) {
             }
@@ -242,9 +243,11 @@ public class DealApiController {
             notificationService.notifyUser(deal.getUser(), "Deal canceled: " + safe(deal.getTitle()));
             if (deal.getUser().getPhone() != null) {
                 smsService.sendToUser(deal.getUser().getPhone(), "Deal canceled: " + safe(deal.getTitle()));
+                smsService.sendWhatsAppToUser(deal.getUser().getPhone(), "Deal canceled: " + safe(deal.getTitle()));
             }
         }
         smsService.sendToAdmins("Deal canceled by " + actor + ": " + safe(deal.getTitle()));
+        smsService.sendWhatsAppToAdmins("Deal canceled by " + actor + ": " + safe(deal.getTitle()));
         return ResponseEntity.ok(Map.of("message", "Deal deleted"));
     }
 
@@ -344,8 +347,10 @@ public class DealApiController {
                         "Payment proof uploaded for: " + safe(deal.getTitle())));
         if (deal.getUser() != null && deal.getUser().getPhone() != null) {
             smsService.sendToUser(deal.getUser().getPhone(), "Payment proof received. Verifying payment.");
+            smsService.sendWhatsAppToUser(deal.getUser().getPhone(), "Payment proof received. Verifying payment.");
         }
         smsService.sendToAdmins("Payment proof uploaded: " + safe(deal.getTitle()));
+        smsService.sendWhatsAppToAdmins("Payment proof uploaded: " + safe(deal.getTitle()));
 
         return ResponseEntity.ok(Map.of("message", "Payment proof uploaded"));
     }
@@ -409,6 +414,7 @@ public class DealApiController {
             emailService.sendDealCreatedToUser(deal.getUser().getEmail(), baseText);
         }
         smsService.sendToAdmins("New deal created: " + safe(deal.getTitle()));
+        smsService.sendWhatsAppToAdmins("New deal created: " + safe(deal.getTitle()));
     }
 
     private String safe(String value) {
