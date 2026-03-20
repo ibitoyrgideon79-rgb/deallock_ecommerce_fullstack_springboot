@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Controller
@@ -59,9 +60,11 @@ public class RegisterController {
             model.addAttribute("error", "An account with this email already exists.");
             return "register";
         }
-        var emailEntry = otpRepo.findTopByEmailOrderByIdDesc(registerDto.getEmail());
-        var phoneEntry = registerDto.getPhone() == null ? java.util.Optional.empty()
-                : otpRepo.findTopByPhoneOrderByIdDesc(registerDto.getPhone());
+        Optional<com.deallock.backend.entities.OtpCode> emailEntry =
+                otpRepo.findTopByEmailOrderByIdDesc(registerDto.getEmail());
+        Optional<com.deallock.backend.entities.OtpCode> phoneEntry =
+                registerDto.getPhone() == null ? Optional.empty()
+                        : otpRepo.findTopByPhoneOrderByIdDesc(registerDto.getPhone());
         boolean verified = emailEntry.isPresent() && emailEntry.get().isVerified()
                 || phoneEntry.isPresent() && phoneEntry.get().isVerified();
         if (!verified) {
