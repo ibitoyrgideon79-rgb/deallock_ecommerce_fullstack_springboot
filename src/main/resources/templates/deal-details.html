@@ -83,7 +83,7 @@
       <ul class="nav-links">
         <li><a href="/dashboard">Back to Dashboard</a></li>
         <li><a th:href="@{'/dashboard/deal/' + ${deal.id} + '/track'}">Track Deal</a></li>
-        <li><a href="/dashboard" class="close-link" aria-label="Close">×</a></li>
+        <li><a href="/dashboard" class="close-link" aria-label="Close">&times;</a></li>
         <li><a href="/logout">Log out</a></li>
       </ul>
     </nav>
@@ -183,11 +183,3 @@
   </main>
 </body>
 </html>
-    .deal-status {
-      background: #ecfdf3;
-      border: 1px solid #86efac;
-      color: #14532d;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-weight: 600;
-    }
