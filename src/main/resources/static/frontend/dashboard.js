@@ -25,7 +25,7 @@ const form = document.getElementById('new-deal-form');
 const modal = document.getElementById('create-deal-modal');
 const dealsMessage = document.getElementById('deals-message');
 const API_DEALS = '/api/deals';
-const MAX_PHOTO_BYTES = 10 * 1024 * 1024; // 10MB
+const MAX_PHOTO_BYTES = 500 * 1024; // 500KB
 const REQUEST_TIMEOUT_MS = 60000;
 
 function openModal() {
@@ -136,12 +136,17 @@ async function saveDeal(formData) {
   }
 
   const contentType = res.headers.get('content-type') || '';
-  const data = contentType.includes('application/json')
-    ? await res.json().catch(() => ({}))
-    : { message: (await res.text().catch(() => '')) };
+  let data;
+  if (contentType.includes('application/json')) {
+    data = await res.json().catch(() => ({}));
+  } else {
+    const text = await res.text().catch(() => '');
+    const looksLikeHtml = text.includes('<!DOCTYPE') || text.includes('<html');
+    data = { message: looksLikeHtml ? '' : text };
+  }
 
   if (!res.ok) {
-    const msg = data && data.message ? data.message : 'Failed to create deal';
+    const msg = data && data.message ? data.message : 'Failed to create deal. Please try again.';
     throw new Error(msg);
   }
   await loadDeals();
@@ -177,7 +182,7 @@ form?.addEventListener('submit', async e => {
     return;
   }
   if (photo && photo.size && photo.size > MAX_PHOTO_BYTES) {
-    if (dealsMessage) dealsMessage.textContent = 'Image is too large. Max 10MB.';
+    if (dealsMessage) dealsMessage.textContent = 'Image is too large. Max 500KB.';
     return;
   }
 
